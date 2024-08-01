@@ -5,7 +5,7 @@ function Footer() {
   return (
     <footer className="bg-light py-3 mt-auto">
       <Container>
-        <p className="text-center mb-0">&copy; Wedding Wise</p>
+        <p className="text-center mb-0">&copy; Wedding Wise. DS.</p>
       </Container>
     </footer>
   );

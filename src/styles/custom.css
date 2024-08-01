@@ -1,0 +1,52 @@
+/* src/styles/custom.css */
+:root {
+  --primary: #ff69b4;
+  --secondary: #f8bbd0;
+}
+
+body {
+  font-family: "Arial", sans-serif;
+}
+
+.navbar-brand {
+  font-weight: bold;
+}
+
+/* Custom button styles */
+.btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.btn-primary:hover {
+  background-color: #ff4da6;
+  border-color: #ff4da6;
+}
+
+.btn-outline-primary {
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--primary);
+  color: white;
+}
+
+.card {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: 0.3s;
+}
+
+.card:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.progress-bar {
+  transition: width 0.6s ease;
+}
+
+.table-responsive {
+  max-height: 400px;
+  overflow-y: auto;
+}

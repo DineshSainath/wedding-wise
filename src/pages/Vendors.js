@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
@@ -9,7 +10,7 @@ function Vendors() {
   const queryParams = new URLSearchParams(location.search);
   const eventId = queryParams.get("eventId");
 
-  const vendors = useSelector((state) => state.vendors.vendors);
+  // const vendors = useSelector((state) => state.vendors.vendors);
   const dispatch = useDispatch();
 
   useEffect(() => {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   Container,
   Row,
@@ -18,11 +18,14 @@ import {
   addEventBudgetItem,
   updateEventBudgetItem,
   deleteEventBudgetItem,
+  getEventBudget,
 } from "../redux/actions/budgetActions";
 
 function Budget() {
   const { eventId } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const event = useSelector((state) =>
     state.events.events.find((e) => e.id === parseInt(eventId))
   );
@@ -30,11 +33,19 @@ function Budget() {
     (state) =>
       state.budget.eventBudgets[eventId] || { totalBudget: 0, items: [] }
   );
-  const { totalBudget, items = [] } = eventBudget; // Provide a default empty array for items
+  const { totalBudget, items = [] } = eventBudget;
 
   const [newItem, setNewItem] = useState({ category: "", amount: "" });
   const [editingItem, setEditingItem] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/login");
+    } else if (eventId) {
+      dispatch(getEventBudget(eventId));
+    }
+  }, [dispatch, eventId, isAuthenticated, navigate]);
 
   const handleAddItem = (e) => {
     e.preventDefault();
@@ -68,6 +79,10 @@ function Budget() {
     dispatch(setEventTotalBudget(eventId, Number(newBudget)));
   };
 
+  if (!isAuthenticated) {
+    return null; // or a loading spinner
+  }
+
   if (!event) {
     return (
       <Container>
@@ -95,9 +110,7 @@ function Budget() {
                   type="number"
                   value={totalBudget}
                   onChange={(e) =>
-                    dispatch(
-                      setEventTotalBudget(eventId, Number(e.target.value))
-                    )
+                    handleUpdateTotalBudget(Number(e.target.value))
                   }
                 />
               </Form.Group>
@@ -169,7 +182,7 @@ function Budget() {
                   {items.map((item) => (
                     <tr key={item.id}>
                       <td>{item.category}</td>
-                      <td>₹{Number(item.amount).toFixed(2)}</td>
+                      <td>${Number(item.amount).toFixed(2)}</td>
                       <td>
                         <Button
                           variant="outline-primary"

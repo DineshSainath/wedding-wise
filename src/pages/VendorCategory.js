@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useLocation, useNavigate, Link } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import {
   Container,
   Row,
@@ -9,9 +10,9 @@ import {
   Badge,
   Toast,
   Modal,
+  Alert,
 } from "react-bootstrap";
-import { useDispatch, useSelector } from "react-redux";
-import { updateEventBudget } from "../redux/actions/budgetActions";
+import { getVendors } from "../redux/actions/vendorActions";
 import { addServiceToEvent } from "../redux/actions/eventActions";
 import { addEventBudgetItem } from "../redux/actions/budgetActions";
 
@@ -29,42 +30,29 @@ function VendorCategory() {
   const [showEventModal, setShowEventModal] = useState(false);
   const [selectedVendor, setSelectedVendor] = useState(null);
 
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const events = useSelector((state) => state.events.events);
+  const { vendors, loading, error } = useSelector((state) => state.vendors);
   const currentEvent = useSelector((state) =>
     state.events.events.find((event) => event.id === parseInt(eventId))
   );
 
-  const [vendors, setVendors] = useState([]);
+  useEffect(() => {
+    dispatch(getVendors(category));
+  }, [dispatch, category]);
 
   useEffect(() => {
-    // Generate vendors with random costs
-    const generatedVendors = [
-      {
-        id: 1,
-        name: "Vendor 1",
-        rating: 4.5,
-        description: "Lorem ipsum dolor sit amet.",
-      },
-      {
-        id: 2,
-        name: "Vendor 2",
-        rating: 4.2,
-        description: "Pellentesque habitant morbi tristique senectus.",
-      },
-      {
-        id: 3,
-        name: "Vendor 3",
-        rating: 4.8,
-        description: "Nullam non felis at augue bibendum bibendum.",
-      },
-    ].map((vendor) => ({
-      ...vendor,
-      cost: Math.floor(Math.random() * 1000) + 500, // Random cost between 500 and 1500
-    }));
-    setVendors(generatedVendors);
-  }, []);
+    if (!isAuthenticated && (eventId || showEventModal)) {
+      navigate("/login");
+    }
+  }, [isAuthenticated, eventId, showEventModal, navigate]);
 
   const handleAddService = (vendor) => {
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+
     if (eventId) {
       dispatch(addServiceToEvent(parseInt(eventId), { ...vendor, category }));
       dispatch(
@@ -101,6 +89,14 @@ function VendorCategory() {
     setShowEventModal(false);
   };
 
+  if (loading) {
+    return <div>Loading vendors...</div>;
+  }
+
+  if (error) {
+    return <Alert variant="danger">Error: {error}</Alert>;
+  }
+
   return (
     <Container>
       <Button as={Link} to="/vendors" className="mb-3">
@@ -114,27 +110,31 @@ function VendorCategory() {
           </Badge>
         )}
       </h2>
-      <Row>
-        {vendors.map((vendor) => (
-          <Col key={vendor.id} md={4} className="mb-4">
-            <Card>
-              <Card.Body>
-                <Card.Title>{vendor.name}</Card.Title>
-                <Card.Subtitle className="mb-2 text-muted">
-                  Rating: {vendor.rating} | Cost: ₹{vendor.cost}
-                </Card.Subtitle>
-                <Card.Text>{vendor.description}</Card.Text>
-                <Button
-                  variant="primary"
-                  onClick={() => handleAddService(vendor)}
-                >
-                  Add Service
-                </Button>
-              </Card.Body>
-            </Card>
-          </Col>
-        ))}
-      </Row>
+      {vendors.length === 0 ? (
+        <Alert variant="info">No vendors found for this category.</Alert>
+      ) : (
+        <Row>
+          {vendors.map((vendor) => (
+            <Col key={vendor.id} md={4} className="mb-4">
+              <Card>
+                <Card.Body>
+                  <Card.Title>{vendor.name}</Card.Title>
+                  <Card.Subtitle className="mb-2 text-muted">
+                    Rating: {vendor.rating} | Cost: ${vendor.cost}
+                  </Card.Subtitle>
+                  <Card.Text>{vendor.description}</Card.Text>
+                  <Button
+                    variant="primary"
+                    onClick={() => handleAddService(vendor)}
+                  >
+                    Add Service
+                  </Button>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      )}
 
       <Toast
         show={showToast}

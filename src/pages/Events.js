@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { Container, Row, Col, Form, Button, Tabs, Tab } from "react-bootstrap";
 import {
+  getEvents,
   addEvent,
   updateEvent,
   deleteEvent,
 } from "../redux/actions/eventActions";
-import { setEventTotalBudget } from "../redux/actions/budgetActions";
-import { Container, Row, Col, Form, Button, Tabs, Tab } from "react-bootstrap";
 import EventCard from "../components/EventCard";
 
 function Events() {
@@ -14,18 +15,25 @@ function Events() {
     name: "",
     date: "",
     details: "",
-    budget: "",
   });
 
   const events = useSelector((state) => state.events.events);
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/login");
+    } else {
+      dispatch(getEvents());
+    }
+  }, [dispatch, isAuthenticated, navigate]);
 
   const handleAddEvent = (e) => {
     e.preventDefault();
-    const eventId = Date.now();
-    dispatch(addEvent({ ...newEvent, id: eventId }));
-    dispatch(setEventTotalBudget(eventId, Number(newEvent.budget)));
-    setNewEvent({ name: "", date: "", details: "", budget: "" });
+    dispatch(addEvent(newEvent));
+    setNewEvent({ name: "", date: "", details: "" });
   };
 
   const handleUpdateEvent = (updatedEvent) => {
@@ -35,6 +43,10 @@ function Events() {
   const handleDeleteEvent = (eventId) => {
     dispatch(deleteEvent(eventId));
   };
+
+  if (!isAuthenticated) {
+    return null; // or a loading spinner
+  }
 
   return (
     <Container>
@@ -73,17 +85,6 @@ function Events() {
                 onChange={(e) =>
                   setNewEvent({ ...newEvent, details: e.target.value })
                 }
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Budget</Form.Label>
-              <Form.Control
-                type="number"
-                value={newEvent.budget}
-                onChange={(e) =>
-                  setNewEvent({ ...newEvent, budget: e.target.value })
-                }
-                required
               />
             </Form.Group>
             <Button type="submit" variant="primary">

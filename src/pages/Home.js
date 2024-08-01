@@ -10,7 +10,7 @@ import {
   Form,
 } from "react-bootstrap";
 import { addEvent } from "../redux/actions/eventActions";
-import { updateEventBudget } from "../redux/actions/budgetActions";
+import { setEventTotalBudget } from "../redux/actions/budgetActions";
 
 function Home() {
   const dispatch = useDispatch();
@@ -40,7 +40,7 @@ function Home() {
   const handleCreateEvent = () => {
     const eventId = Date.now();
     dispatch(addEvent({ ...newEvent, id: eventId }));
-    dispatch(updateEventBudget(eventId, selectedPackage.price));
+    dispatch(setEventTotalBudget(eventId, selectedPackage.price));
     setShowModal(false);
     setNewEvent({ name: "", date: "", details: "" });
   };

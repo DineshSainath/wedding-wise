@@ -1,11 +1,20 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import { Container, Row, Col, Card, Badge, Button } from "react-bootstrap";
+import { getVendors } from "../redux/actions/vendorActions";
 
 function Vendors() {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const eventId = queryParams.get("eventId");
+
+  const vendors = useSelector((state) => state.vendors.vendors);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getVendors());
+  }, [dispatch]);
 
   const categories = [
     {

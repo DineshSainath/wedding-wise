@@ -51,7 +51,7 @@ function Home() {
     <Container>
       <LandingCarousel />
 
-      <Row className="packages-section">
+      <Row id="package" className="packages-section">
         <h2 className="package-heading"> PACKAGES </h2>
         {packages.map((pkg, index) => (
           <Col md={4} key={index}>

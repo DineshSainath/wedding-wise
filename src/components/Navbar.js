@@ -13,10 +13,11 @@ function AppNavbar() {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">
+            <Nav.Link href="/#package">Packages</Nav.Link>
             <Nav.Link as={Link} to="/events">
               Events
             </Nav.Link>
-            <Nav.Link as={Link} to="/vendors">
+            <Nav.Link as={Link} to="/Vendors">
               Vendors
             </Nav.Link>
             {/*

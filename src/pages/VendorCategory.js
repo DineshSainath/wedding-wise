@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { useState, useEffect } from "react";
 import { useParams, useLocation, useNavigate, Link } from "react-router-dom";
 import {
@@ -15,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateEventBudget } from "../redux/actions/budgetActions";
 import { addServiceToEvent } from "../redux/actions/eventActions";
 import { addEventBudgetItem } from "../redux/actions/budgetActions";
+import { vendorData } from "./vendorData";
 
 function VendorCategory() {
   const { category } = useParams();
@@ -38,32 +38,10 @@ function VendorCategory() {
   const [vendors, setVendors] = useState([]);
 
   useEffect(() => {
-    // Generate vendors with random costs
-    const generatedVendors = [
-      {
-        id: 1,
-        name: "Vendor 1",
-        rating: 4.5,
-        description: "Lorem ipsum dolor sit amet.",
-      },
-      {
-        id: 2,
-        name: "Vendor 2",
-        rating: 4.2,
-        description: "Pellentesque habitant morbi tristique senectus.",
-      },
-      {
-        id: 3,
-        name: "Vendor 3",
-        rating: 4.8,
-        description: "Nullam non felis at augue bibendum bibendum.",
-      },
-    ].map((vendor) => ({
-      ...vendor,
-      cost: Math.floor(Math.random() * 1000) + 500, // Random cost between 500 and 1500
-    }));
-    setVendors(generatedVendors);
-  }, []);
+    if (vendorData[category]) {
+      setVendors(vendorData[category]);
+    }
+  }, [category]);
 
   const handleAddService = (vendor) => {
     if (eventId) {
@@ -108,7 +86,7 @@ function VendorCategory() {
         Back to Vendors
       </Button>
       <h2 className="mb-4">
-        {category} Vendors
+        {category}
         {eventId && (
           <Badge bg="info" className="badge ms-2">
             For Event: {currentEvent?.name || eventId}
@@ -116,25 +94,29 @@ function VendorCategory() {
         )}
       </h2>
       <Row>
-        {vendors.map((vendor) => (
-          <Col key={vendor.id} md={4} className="mb-4">
-            <Card>
-              <Card.Body>
-                <Card.Title>{vendor.name}</Card.Title>
-                <Card.Subtitle className="mb-2 text-muted">
-                  Rating: {vendor.rating} | Cost: ₹{vendor.cost}
-                </Card.Subtitle>
-                <Card.Text>{vendor.description}</Card.Text>
-                <Button
-                  variant="primary"
-                  onClick={() => handleAddService(vendor)}
-                >
-                  Add Service
-                </Button>
-              </Card.Body>
-            </Card>
-          </Col>
-        ))}
+        {vendors.length > 0 ? (
+          vendors.map((vendor) => (
+            <Col key={vendor.id} md={4} className="mb-4">
+              <Card>
+                <Card.Body>
+                  <Card.Title>{vendor.name}</Card.Title>
+                  <Card.Subtitle className="mb-2 text-muted">
+                    Rating: {vendor.rating} | Cost: ₹{vendor.cost}
+                  </Card.Subtitle>
+                  <Card.Text>{vendor.description}</Card.Text>
+                  <Button
+                    variant="primary"
+                    onClick={() => handleAddService(vendor)}
+                  >
+                    Add Service
+                  </Button>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))
+        ) : (
+          <p>No vendors available for this category.</p>
+        )}
       </Row>
 
       <Toast

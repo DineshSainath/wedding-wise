@@ -69,7 +69,7 @@ function Vendors() {
           <Col key={index}>
             <Card
               as={Link}
-              to={`/vendors/${category.name.toLowerCase()}${
+              to={`/Vendors/${category.name}${
                 eventId ? `?eventId=${eventId}` : ""
               }`}
               className="h-100 text-decoration-none"

@@ -19,8 +19,8 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/events" element={<Events />} />
-            <Route path="/vendors" element={<Vendors />} />
-            <Route path="/vendors/:category" element={<VendorCategory />} />
+            <Route path="/Vendors" element={<Vendors />} />
+            <Route path="/Vendors/:category" element={<VendorCategory />} />
             <Route path="/budget/:eventId" element={<Budget />} />
           </Routes>
         </Container>

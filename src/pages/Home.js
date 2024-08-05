@@ -8,11 +8,11 @@ import {
   Card,
   Modal,
   Form,
-  Carousel,
 } from "react-bootstrap";
 import { addEvent } from "../redux/actions/eventActions";
 import { updateEventBudget } from "../redux/actions/budgetActions";
 import LandingCarousel from "../components/Carousel";
+import "../styles/custom.css";
 
 function Home() {
   const dispatch = useDispatch();
@@ -51,12 +51,17 @@ function Home() {
     <Container>
       <LandingCarousel />
 
-      <Row>
+      <Row className="packages-section">
+        <h2 className="package-heading"> PACKAGES </h2>
         {packages.map((pkg, index) => (
           <Col md={4} key={index}>
             <Card className="mb-4">
               <Card.Body>
                 <Card.Title>{pkg.name} Package</Card.Title>
+                <Card.Img
+                  className="package-img"
+                  src="https://i.pinimg.com/736x/a9/71/c7/a971c76a6c64025f8f996bdf8ad8d7f7.jpg"
+                />
                 <Card.Text>{pkg.description}</Card.Text>
                 <Card.Text>Price: ₹{pkg.price}</Card.Text>
                 <Button

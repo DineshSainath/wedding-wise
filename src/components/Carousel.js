@@ -10,10 +10,10 @@ function LandingCarousel() {
           src="https://themaharanidiaries.com/wp-content/uploads/2020/03/The-Ultimate-Wedding-Planning-Checklist-Printable_The-Maharani-Diaries-scaled.jpg"
           alt="First slide"
         />
-        <Carousel.Caption>
-          <h4>
+        <Carousel.Caption className="caption">
+          <h1>
             <strong>Wedding Wise</strong>
-          </h4>
+          </h1>
           <p>Creating Heaven for Marriages</p>
           <Button> Start Planning </Button>
         </Carousel.Caption>
@@ -24,10 +24,10 @@ function LandingCarousel() {
           src="https://myboundlessthoughts.wordpress.com/wp-content/uploads/2013/09/mg_0241.jpg"
           alt="Second slide"
         />
-        <Carousel.Caption>
-          <h4>
+        <Carousel.Caption className="caption">
+          <h1>
             <strong>Wedding Wise</strong>
-          </h4>
+          </h1>
           <p>Creating Heaven for Marriages</p>
           <Button> Start Planning </Button>
         </Carousel.Caption>
@@ -38,10 +38,10 @@ function LandingCarousel() {
           src="https://miro.medium.com/v2/resize:fit:1024/1*cMOShxni5kn-gJ3qHqDgKw.jpeg"
           alt="Third slide"
         />
-        <Carousel.Caption>
-          <h4>
+        <Carousel.Caption className="caption">
+          <h1>
             <strong>Wedding Wise</strong>
-          </h4>
+          </h1>
           <p>Creating Heaven for Marriages</p>
           <Button> Start Planning </Button>
         </Carousel.Caption>

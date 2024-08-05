@@ -1,10 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Navbar, Nav, Container } from "react-bootstrap";
+import "../styles/custom.css";
 
 function AppNavbar() {
   return (
-    <Navbar bg="light" expand="lg" className="mb-3">
+    <Navbar expand="lg" className="custom-navbar mb-3">
       <Container>
         <Navbar.Brand as={Link} to="/">
           Wedding Wise

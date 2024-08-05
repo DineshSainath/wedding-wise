@@ -1,11 +1,22 @@
+/* eslint-disable */
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { Container, Row, Col, Card, Badge, Button } from "react-bootstrap";
 
 function Vendors() {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const eventId = queryParams.get("eventId");
+
+  //
+
+  const events = useSelector((state) => state.events.events);
+  const currentEvent = useSelector((state) =>
+    state.events.events.find((event) => event.id === parseInt(eventId))
+  );
+
+  //
 
   const categories = [
     {
@@ -48,8 +59,8 @@ function Vendors() {
       <h2 className="mb-4">
         Vendor Categories
         {eventId && (
-          <Badge bg="info" className="ms-2">
-            For Event: {eventId}
+          <Badge bg="info" className="badge ms-4">
+            For Event: {currentEvent?.name || eventId}
           </Badge>
         )}
       </h2>

@@ -8,9 +8,11 @@ import {
   Card,
   Modal,
   Form,
+  Carousel,
 } from "react-bootstrap";
 import { addEvent } from "../redux/actions/eventActions";
 import { updateEventBudget } from "../redux/actions/budgetActions";
+import LandingCarousel from "../components/Carousel";
 
 function Home() {
   const dispatch = useDispatch();
@@ -47,7 +49,8 @@ function Home() {
 
   return (
     <Container>
-      <h1>Welcome to Wedding Planner</h1>
+      <LandingCarousel />
+
       <Row>
         {packages.map((pkg, index) => (
           <Col md={4} key={index}>

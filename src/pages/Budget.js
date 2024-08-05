@@ -102,7 +102,7 @@ function Budget() {
                 />
               </Form.Group>
               <Card.Text>
-                <strong>Remaining: ${remainingBudget.toFixed(2)}</strong>
+                <strong>Remaining: ₹{remainingBudget.toFixed(2)}</strong>
               </Card.Text>
               <ProgressBar
                 now={budgetProgress}

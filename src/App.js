@@ -8,6 +8,7 @@ import Events from "./pages/Events";
 import Vendors from "./pages/Vendors";
 import VendorCategory from "./pages/VendorCategory";
 import Budget from "./pages/Budget";
+import "./styles/custom.css";
 
 function App() {
   return (

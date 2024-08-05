@@ -144,7 +144,7 @@ function EventCard({ event, onUpdate, onDelete }) {
             {event.services &&
               event.services.map((service, index) => (
                 <ListGroup.Item key={index}>
-                  {service.name} - {service.category} - ${service.cost}
+                  {service.name} - {service.category} - ₹{service.cost}
                 </ListGroup.Item>
               ))}
           </ListGroup>

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState, useEffect } from "react";
 import { useParams, useLocation, useNavigate, Link } from "react-router-dom";
 import {
@@ -109,7 +110,7 @@ function VendorCategory() {
       <h2 className="mb-4">
         {category} Vendors
         {eventId && (
-          <Badge bg="info" className="ms-2">
+          <Badge bg="info" className="badge ms-2">
             For Event: {currentEvent?.name || eventId}
           </Badge>
         )}

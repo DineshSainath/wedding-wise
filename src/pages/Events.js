@@ -38,7 +38,7 @@ function Events() {
 
   return (
     <Container>
-      <h2 className="mb-4">Events</h2>
+      <h2 className="mb-3">Events</h2>
       <Tabs defaultActiveKey="add" id="events-tabs">
         <Tab eventKey="add" title="Add an Event">
           <Form onSubmit={handleAddEvent} className="mt-3">
@@ -53,17 +53,35 @@ function Events() {
                 required
               />
             </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Date</Form.Label>
-              <Form.Control
-                type="date"
-                value={newEvent.date}
-                onChange={(e) =>
-                  setNewEvent({ ...newEvent, date: e.target.value })
-                }
-                required
-              />
-            </Form.Group>
+            <Row>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Date</Form.Label>
+                  <Form.Control
+                    type="date"
+                    value={newEvent.date}
+                    onChange={(e) =>
+                      setNewEvent({ ...newEvent, date: e.target.value })
+                    }
+                    required
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Budget</Form.Label>
+                  <Form.Control
+                    type="number"
+                    value={newEvent.budget}
+                    onChange={(e) =>
+                      setNewEvent({ ...newEvent, budget: e.target.value })
+                    }
+                    required
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+
             <Form.Group className="mb-3">
               <Form.Label>Details</Form.Label>
               <Form.Control
@@ -75,17 +93,7 @@ function Events() {
                 }
               />
             </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Budget</Form.Label>
-              <Form.Control
-                type="number"
-                value={newEvent.budget}
-                onChange={(e) =>
-                  setNewEvent({ ...newEvent, budget: e.target.value })
-                }
-                required
-              />
-            </Form.Group>
+
             <Button type="submit" variant="primary">
               Add Event
             </Button>

@@ -82,15 +82,17 @@ function VendorCategory() {
 
   return (
     <Container>
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <Button as={Link} to="/vendors" className="flex-shrink-0">
+      <div className="header-container d-flex justify-content-between align-items-center mb-4">
+        <Button as={Link} to="/vendors" className="back-button flex-shrink-0">
           Back to Vendors
         </Button>
-        <h2 className="m-0 text-center flex-grow-1">{category}</h2>
-        {eventId && (
-          <Badge bg="info" className="badge flex-shrink-0">
+        <h2 className="title m-0 text-center flex-grow-1">{category}</h2>
+        {eventId ? (
+          <Badge bg="info" className="event-badge flex-shrink-0">
             For Event: {currentEvent?.name || eventId}
           </Badge>
+        ) : (
+          <div className="badge-placeholder"></div>
         )}
       </div>
       <Row>

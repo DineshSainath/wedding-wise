@@ -33,7 +33,7 @@ const eventReducer = (state = initialState, action) => {
             : event
         ),
       };
-    case "REMOVE_SERVICE_FROM_EVENT":
+    case "DELETE_EVENT_BUDGET_ITEM":
       return {
         ...state,
         events: state.events.map((event) =>
@@ -41,7 +41,9 @@ const eventReducer = (state = initialState, action) => {
             ? {
                 ...event,
                 services: (event.services || []).filter(
-                  (service) => service.id !== action.payload.serviceId
+                  (service) =>
+                    `${service.category} - ${service.name}` !==
+                    action.payload.itemCategory
                 ),
               }
             : event

@@ -13,9 +13,9 @@ export const updateEventBudgetItem = (eventId, item) => ({
   payload: { eventId, item },
 });
 
-export const deleteEventBudgetItem = (eventId, itemId) => ({
+export const deleteEventBudgetItem = (eventId, itemId, itemCategory) => ({
   type: "DELETE_EVENT_BUDGET_ITEM",
-  payload: { eventId, itemId },
+  payload: { eventId, itemId, itemCategory },
 });
 
 export const updateEventBudget = (eventId, amount) => ({

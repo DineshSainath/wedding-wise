@@ -104,7 +104,7 @@ function EventCard({ event, onUpdate, onDelete }) {
                 now={budgetProgress}
                 label={`${budgetProgress.toFixed(2)}%`}
               />
-              <small>Remaining: ${remainingBudget.toFixed(2)}</small>
+              <small>Remaining: ₹{remainingBudget.toFixed(2)}</small>
             </div>
             <Button
               variant="outline-primary"

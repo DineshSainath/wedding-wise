@@ -34,6 +34,10 @@ function VendorCategory() {
   const currentEvent = useSelector((state) =>
     state.events.events.find((event) => event.id === parseInt(eventId))
   );
+  const eventBudget = useSelector(
+    (state) =>
+      state.budget.eventBudgets[eventId] || { totalBudget: 0, items: [] }
+  );
 
   const [vendors, setVendors] = useState([]);
 
@@ -44,9 +48,9 @@ function VendorCategory() {
   }, [category]);
 
   const isVendorAdded = (vendor) => {
-    if (!currentEvent || !currentEvent.services) return false;
-    return currentEvent.services.some(
-      (service) => service.id === vendor.id && service.category === category
+    if (!eventBudget || !eventBudget.items) return false;
+    return eventBudget.items.some(
+      (item) => item.category === `${category} - ${vendor.name}`
     );
   };
 
@@ -82,7 +86,7 @@ function VendorCategory() {
 
   const handleAddServiceToEvent = (eventId) => {
     const targetEvent = events.find((event) => event.id === eventId);
-    if (targetEvent && targetEvent.services && isVendorAdded(selectedVendor)) {
+    if (targetEvent && isVendorAdded(selectedVendor)) {
       setToastMessage(`${selectedVendor.name} is already added to the event!`);
       setShowToast(true);
       setShowEventModal(false);

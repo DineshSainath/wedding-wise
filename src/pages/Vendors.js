@@ -53,17 +53,17 @@ function Vendors() {
 
   return (
     <Container>
-      <Button as={Link} to="/events" className="mb-3">
-        Back to Events
-      </Button>
-      <h2 className="mb-4">
-        Vendor Categories
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <Button as={Link} to="/events" className="flex-shrink-0">
+          Back to Events
+        </Button>
+        <h2 className="m-0 text-center flex-grow-1">Vendor Categories</h2>
         {eventId && (
-          <Badge bg="info" className="badge ms-4">
+          <Badge bg="info" className="badge flex-shrink-0">
             For Event: {currentEvent?.name || eventId}
           </Badge>
         )}
-      </h2>
+      </div>
       <Row xs={1} md={2} className="g-4">
         {categories.map((category, index) => (
           <Col key={index}>

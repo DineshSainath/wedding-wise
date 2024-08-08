@@ -5,6 +5,7 @@ export const vendorData = {
       name: "Elegant Hall",
       rating: 4.7,
       description: "A luxurious venue for your big day.",
+      img: "https://miro.medium.com/v2/resize:fit:1358/0*gF6VUwu3ka70hHWd",
       cost: 1200,
     },
     {
@@ -12,6 +13,7 @@ export const vendorData = {
       name: "Garden Paradise",
       rating: 4.5,
       description: "A serene garden setting for your wedding.",
+      img: "https://www.lolavalentina.com/wp-content/uploads/2022/02/MicrosoftTeams-image-38.jpg",
       cost: 1500,
     },
     {
@@ -19,6 +21,7 @@ export const vendorData = {
       name: "City Ballroom",
       rating: 4.8,
       description: "A modern venue with all the amenities.",
+      img: "https://lapkovsky.com/wp-content/uploads/2020/10/nyc-wedding-venues-9.jpg",
       cost: 1300,
     },
   ],
@@ -28,6 +31,7 @@ export const vendorData = {
       name: "Picture Perfect",
       rating: 4.9,
       description: "Capture every moment beautifully.",
+      img: "https://jermainechandra.com/wp-content/uploads/2020/06/indian-wedding-photographer-london-2%28pp_w1200_h801%29.jpg",
       cost: 800,
     },
     {
@@ -35,6 +39,7 @@ export const vendorData = {
       name: "Memory Makers",
       rating: 4.6,
       description: "Expert photographers for your special day.",
+      img: "https://www.weddingsutra.com/images/Vendor_Images/Photographer/hiraaya-by-aayushi/hiraaya-by-aayushi-03.jpg",
       cost: 1000,
     },
     {
@@ -42,6 +47,7 @@ export const vendorData = {
       name: "Snapshot Studios",
       rating: 4.7,
       description: "Professional photography services.",
+      img: "https://studioa.amarramesh.com/wp-content/uploads/2023/01/candid-telugu-wedding-photographer-amarramesh-208-2048x1366.jpg",
       cost: 900,
     },
   ],
@@ -51,6 +57,7 @@ export const vendorData = {
       name: "Gourmet Delights",
       rating: 4.8,
       description: "Exquisite cuisine to delight your guests.",
+      img: "https://i.pinimg.com/736x/1e/db/93/1edb9309668d23301737e04e6f327cb3.jpg",
       cost: 2000,
     },
     {
@@ -58,6 +65,7 @@ export const vendorData = {
       name: "Feast & Fête",
       rating: 4.6,
       description: "Exceptional catering for all occasions.",
+      img: "https://cdn.prod.website-files.com/60829aab76a98d17b68f30ae/6163e9639acc50511839442d_wedding-catering-1-scaled.jpg",
       cost: 1800,
     },
     {
@@ -65,6 +73,7 @@ export const vendorData = {
       name: "Culinary Creations",
       rating: 4.9,
       description: "Innovative menus for your event.",
+      img: "https://media.timeout.com/images/106139845/750/562/image.jpg",
       cost: 2100,
     },
   ],
@@ -74,6 +83,7 @@ export const vendorData = {
       name: "Elegant Events",
       rating: 4.8,
       description: "Transform your venue with beautiful decor.",
+      img: "https://www.vermiliondecors.com/assets/images/blog/b2.webp",
       cost: 1700,
     },
     {
@@ -81,6 +91,7 @@ export const vendorData = {
       name: "Stunning Stages",
       rating: 4.7,
       description: "Creative decor solutions for your event.",
+      img: "https://5.imimg.com/data5/EQ/RD/MY-16269838/wedding-decor.jpg",
       cost: 1600,
     },
     {
@@ -88,6 +99,7 @@ export const vendorData = {
       name: "Floral Fantasy",
       rating: 4.9,
       description: "Breathtaking floral arrangements and decor.",
+      img: "https://miro.medium.com/v2/resize:fit:2000/1*51CqcQa0VEiF1UISdO18gg.jpeg",
       cost: 1900,
     },
   ],
@@ -97,6 +109,7 @@ export const vendorData = {
       name: "Melody Makers",
       rating: 4.7,
       description: "Talented musicians for your wedding.",
+      img: "https://media-api.xogrp.com/images/d9075929-30be-43ac-896a-77fe902674b2~rs_768.h",
       cost: 1400,
     },
     {
@@ -104,6 +117,7 @@ export const vendorData = {
       name: "DJ Beats",
       rating: 4.8,
       description: "Professional DJ services for your event.",
+      img: "https://cdn-ibgob.nitrocdn.com/PTpOlpSMcykSGACidTmMIMBNqKZxFciU/assets/images/optimized/rev-5b5a3ca/www.amainevent.com/wp-content/uploads/2022/12/Need-a-DJ-at-a-Wedding-1.jpg",
       cost: 1500,
     },
     {
@@ -111,6 +125,7 @@ export const vendorData = {
       name: "Harmony Bands",
       rating: 4.9,
       description: "Live music to set the perfect tone.",
+      img: "https://www.aurusjewels.com/cdn/shop/articles/Indian_wedding_baraat.jpg?v=1676974447",
       cost: 1600,
     },
   ],
@@ -120,6 +135,7 @@ export const vendorData = {
       name: "Bridal Bliss",
       rating: 4.9,
       description: "Find the perfect dress for your big day.",
+      img: "https://i.pinimg.com/736x/4f/7b/2d/4f7b2d40f575d5bad313775c3340a004.jpg",
       cost: 3000,
     },
     {
@@ -127,6 +143,7 @@ export const vendorData = {
       name: "Groom's Elegance",
       rating: 4.8,
       description: "Stylish suits and tuxedos for the groom.",
+      img: "https://www.mizaj.com/assets/img/blog/best-wedding-suits-in-chennai.jpg",
       cost: 2500,
     },
     {
@@ -134,6 +151,7 @@ export const vendorData = {
       name: "Wedding Wardrobe",
       rating: 4.7,
       description: "Exclusive bridal and groom attire.",
+      img: "https://miro.medium.com/v2/resize:fit:1400/1*G5ZZ6n0AmknOPAWRN6VP2w.jpeg",
       cost: 2800,
     },
   ],

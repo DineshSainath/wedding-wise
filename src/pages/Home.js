@@ -21,16 +21,23 @@ function Home() {
   const [newEvent, setNewEvent] = useState({ name: "", date: "", details: "" });
 
   const packages = [
-    { name: "Basic", price: 1000, description: "Essential wedding services" },
+    {
+      name: "Basic",
+      price: 1000,
+      description: "Essential wedding services",
+      img: "https://i.pinimg.com/736x/b3/d0/b5/b3d0b5b47b98892c43b6dabb77fd76f3.jpg",
+    },
     {
       name: "Premium",
       price: 3000,
       description: "Comprehensive wedding package",
+      img: "https://i.pinimg.com/736x/d9/98/1f/d9981f2532fdc8374e4fed0c6f5c3256.jpg",
     },
     {
       name: "Luxury",
       price: 5000,
       description: "All-inclusive luxury wedding experience",
+      img: "https://i.pinimg.com/736x/a9/71/c7/a971c76a6c64025f8f996bdf8ad8d7f7.jpg",
     },
   ];
 
@@ -58,10 +65,7 @@ function Home() {
             <Card className="mb-4">
               <Card.Body>
                 <Card.Title>{pkg.name} Package</Card.Title>
-                <Card.Img
-                  className="package-img"
-                  src="https://i.pinimg.com/736x/a9/71/c7/a971c76a6c64025f8f996bdf8ad8d7f7.jpg"
-                />
+                <Card.Img className="package-img" src={pkg.img} />
                 <Card.Text>{pkg.description}</Card.Text>
                 <Card.Text>Price: ₹{pkg.price}</Card.Text>
                 <Button

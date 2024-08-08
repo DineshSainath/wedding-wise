@@ -100,6 +100,7 @@ function VendorCategory() {
               <Card>
                 <Card.Body>
                   <Card.Title>{vendor.name}</Card.Title>
+                  <Card.Img className="vendor-img" src={vendor.img}></Card.Img>
                   <Card.Subtitle className="mb-2 text-muted">
                     Rating: {vendor.rating} | Cost: ₹{vendor.cost}
                   </Card.Subtitle>

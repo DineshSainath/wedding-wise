@@ -16,6 +16,7 @@ function Events() {
     details: "",
     budget: "",
   });
+  const [activeTab, setActiveTab] = useState("add");
 
   const events = useSelector((state) => state.events.events);
   const dispatch = useDispatch();
@@ -26,6 +27,7 @@ function Events() {
     dispatch(addEvent({ ...newEvent, id: eventId }));
     dispatch(setEventTotalBudget(eventId, Number(newEvent.budget)));
     setNewEvent({ name: "", date: "", details: "", budget: "" });
+    setActiveTab("list"); // Switch to the event list tab
   };
 
   const handleUpdateEvent = (updatedEvent) => {
@@ -39,7 +41,11 @@ function Events() {
   return (
     <Container>
       <h2 className="mb-3">Events</h2>
-      <Tabs defaultActiveKey="add" id="events-tabs">
+      <Tabs
+        activeKey={activeTab}
+        onSelect={(k) => setActiveTab(k)}
+        id="events-tabs"
+      >
         <Tab eventKey="add" title="Add an Event">
           <Form onSubmit={handleAddEvent} className="mt-3">
             <Form.Group className="mb-3">

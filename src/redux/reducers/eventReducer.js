@@ -33,6 +33,20 @@ const eventReducer = (state = initialState, action) => {
             : event
         ),
       };
+    case "REMOVE_SERVICE_FROM_EVENT":
+      return {
+        ...state,
+        events: state.events.map((event) =>
+          event.id === action.payload.eventId
+            ? {
+                ...event,
+                services: (event.services || []).filter(
+                  (service) => service.id !== action.payload.serviceId
+                ),
+              }
+            : event
+        ),
+      };
     default:
       return state;
   }

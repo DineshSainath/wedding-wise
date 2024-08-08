@@ -19,6 +19,15 @@ function EventCard({ event, onUpdate, onDelete }) {
     (state) =>
       state.budget.eventBudgets[event.id] || { totalBudget: 0, items: [] }
   );
+
+  // new code
+  const services = eventBudget.items.map((item) => ({
+    id: item.id,
+    name: item.category.split(" - ")[1],
+    category: item.category.split(" - ")[0],
+    cost: item.amount,
+  }));
+
   const totalExpenses = eventBudget.items
     ? eventBudget.items.reduce((sum, item) => sum + Number(item.amount), 0)
     : 0;
@@ -141,12 +150,11 @@ function EventCard({ event, onUpdate, onDelete }) {
           </p>
           <h5>Vendor Services</h5>
           <ListGroup>
-            {event.services &&
-              event.services.map((service, index) => (
-                <ListGroup.Item key={index}>
-                  {service.name} - {service.category} - ₹{service.cost}
-                </ListGroup.Item>
-              ))}
+            {services.map((service, index) => (
+              <ListGroup.Item key={service.id}>
+                {service.name} - {service.category} - ₹{service.cost}
+              </ListGroup.Item>
+            ))}
           </ListGroup>
           <Link
             to={`/vendors?eventId=${event.id}`}

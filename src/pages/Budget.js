@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import {
@@ -33,10 +33,6 @@ function Budget() {
 
   const [newItem, setNewItem] = useState({ category: "", amount: "" });
 
-  useEffect(() => {
-    console.log("Current items in state:", items);
-  }, [items]);
-
   const handleAddItem = (e) => {
     e.preventDefault();
     if (newItem.category && newItem.amount) {
@@ -45,14 +41,12 @@ function Budget() {
         id: `item_${Date.now()}`,
         amount: Number(newItem.amount),
       };
-      console.log("Adding item:", itemToAdd);
       dispatch(addEventBudgetItem(eventId, itemToAdd));
       setNewItem({ category: "", amount: "" });
     }
   };
 
   const handleDeleteItem = (itemId) => {
-    console.log("Attempting to delete item with ID:", itemId);
     if (itemId) {
       dispatch(deleteEventBudgetItem(eventId, itemId));
     } else {
@@ -60,7 +54,7 @@ function Budget() {
     }
   };
 
-  const handleEditRedirect = (item) => {
+  const handleEditItem = (item) => {
     const category = item.category.split(" - ")[0];
     navigate(`/vendors/${category}?eventId=${eventId}`);
   };
@@ -172,15 +166,15 @@ function Budget() {
                 </thead>
                 <tbody>
                   {items.map((item) => (
-                    <tr key={item.id || `temp_${item.category}_${item.amount}`}>
+                    <tr key={item.id}>
                       <td>{item.category}</td>
                       <td>₹{Number(item.amount).toFixed(2)}</td>
                       <td>
                         <Button
                           variant="outline-primary"
                           size="sm"
+                          onClick={() => handleEditItem(item)}
                           className="me-2"
-                          onClick={() => handleEditRedirect(item)}
                         >
                           Edit
                         </Button>

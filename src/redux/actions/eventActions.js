@@ -17,3 +17,8 @@ export const addServiceToEvent = (eventId, service) => ({
   type: "ADD_SERVICE_TO_EVENT",
   payload: { eventId, service },
 });
+
+export const removeServiceFromEvent = (eventId, serviceId) => ({
+  type: "REMOVE_SERVICE_FROM_EVENT",
+  payload: { eventId, serviceId },
+});

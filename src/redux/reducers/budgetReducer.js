@@ -44,11 +44,9 @@ const budgetReducer = (state = initialState, action) => {
       }
       const currentItems =
         state.eventBudgets[action.payload.eventId]?.items || [];
-      console.log("Current items:", currentItems);
       const updatedItems = currentItems.filter(
         (item) => item.id !== action.payload.itemId
       );
-      console.log("Updated items:", updatedItems);
       return {
         ...state,
         eventBudgets: {
@@ -60,16 +58,17 @@ const budgetReducer = (state = initialState, action) => {
         },
       };
 
-    case "UPDATE_EVENT_BUDGET":
+    case "UPDATE_EVENT_BUDGET_ITEM":
       return {
         ...state,
         eventBudgets: {
           ...state.eventBudgets,
           [action.payload.eventId]: {
             ...state.eventBudgets[action.payload.eventId],
-            totalBudget:
-              (state.eventBudgets[action.payload.eventId]?.totalBudget || 0) +
-              action.payload.amount,
+            items: state.eventBudgets[action.payload.eventId].items.map(
+              (item) =>
+                item.id === action.payload.item.id ? action.payload.item : item
+            ),
           },
         },
       };

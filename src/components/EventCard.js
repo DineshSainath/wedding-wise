@@ -120,7 +120,7 @@ function EventCard({ event, onUpdate, onDelete }) {
             </Button>
             <Link
               to={`/budget/${event.id}`}
-              className="btn btn-outline-success"
+              className="manage-budget btn btn-outline-success"
             >
               Manage Budget
             </Link>

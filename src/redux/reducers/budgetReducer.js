@@ -1,5 +1,3 @@
-// budgetReducer.js
-
 const initialState = {
   eventBudgets: {},
 };
@@ -20,6 +18,7 @@ const budgetReducer = (state = initialState, action) => {
       };
 
     case "ADD_EVENT_BUDGET_ITEM":
+      console.log("Adding item:", action.payload.item);
       return {
         ...state,
         eventBudgets: {
@@ -28,37 +27,35 @@ const budgetReducer = (state = initialState, action) => {
             ...state.eventBudgets[action.payload.eventId],
             items: [
               ...(state.eventBudgets[action.payload.eventId]?.items || []),
-              action.payload.item,
+              {
+                ...action.payload.item,
+                id: action.payload.item.id || `item_${Date.now()}`,
+              },
             ],
           },
         },
       };
 
-    case "UPDATE_EVENT_BUDGET_ITEM":
-      return {
-        ...state,
-        eventBudgets: {
-          ...state.eventBudgets,
-          [action.payload.eventId]: {
-            ...state.eventBudgets[action.payload.eventId],
-            items: state.eventBudgets[action.payload.eventId].items.map(
-              (item) =>
-                item.id === action.payload.item.id ? action.payload.item : item
-            ),
-          },
-        },
-      };
-
     case "DELETE_EVENT_BUDGET_ITEM":
+      console.log("Deleting item. Payload:", action.payload);
+      if (!action.payload.itemId) {
+        console.error("Attempted to delete item with undefined ID");
+        return state;
+      }
+      const currentItems =
+        state.eventBudgets[action.payload.eventId]?.items || [];
+      console.log("Current items:", currentItems);
+      const updatedItems = currentItems.filter(
+        (item) => item.id !== action.payload.itemId
+      );
+      console.log("Updated items:", updatedItems);
       return {
         ...state,
         eventBudgets: {
           ...state.eventBudgets,
           [action.payload.eventId]: {
             ...state.eventBudgets[action.payload.eventId],
-            items: state.eventBudgets[action.payload.eventId].items.filter(
-              (item) => item.id !== action.payload.itemId
-            ),
+            items: updatedItems,
           },
         },
       };

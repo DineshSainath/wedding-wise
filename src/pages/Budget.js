@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   Container,
   Row,
@@ -10,19 +10,18 @@ import {
   Button,
   Table,
   ProgressBar,
-  Modal,
   Alert,
 } from "react-bootstrap";
 import {
   setEventTotalBudget,
   addEventBudgetItem,
-  updateEventBudgetItem,
   deleteEventBudgetItem,
 } from "../redux/actions/budgetActions";
 
 function Budget() {
   const { eventId } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const event = useSelector((state) =>
     state.events.events.find((e) => e.id === parseInt(eventId))
   );
@@ -30,30 +29,40 @@ function Budget() {
     (state) =>
       state.budget.eventBudgets[eventId] || { totalBudget: 0, items: [] }
   );
-  const { totalBudget, items = [] } = eventBudget; // Provide a default empty array for items
+  const { totalBudget, items = [] } = eventBudget;
 
   const [newItem, setNewItem] = useState({ category: "", amount: "" });
-  const [editingItem, setEditingItem] = useState(null);
-  const [showEditModal, setShowEditModal] = useState(false);
+
+  useEffect(() => {
+    console.log("Current items in state:", items);
+  }, [items]);
 
   const handleAddItem = (e) => {
     e.preventDefault();
     if (newItem.category && newItem.amount) {
-      dispatch(addEventBudgetItem(eventId, { ...newItem, id: Date.now() }));
+      const itemToAdd = {
+        ...newItem,
+        id: `item_${Date.now()}`,
+        amount: Number(newItem.amount),
+      };
+      console.log("Adding item:", itemToAdd);
+      dispatch(addEventBudgetItem(eventId, itemToAdd));
       setNewItem({ category: "", amount: "" });
     }
   };
 
-  const handleUpdateItem = () => {
-    if (editingItem.category && editingItem.amount) {
-      dispatch(updateEventBudgetItem(eventId, editingItem));
-      setShowEditModal(false);
-      setEditingItem(null);
+  const handleDeleteItem = (itemId) => {
+    console.log("Attempting to delete item with ID:", itemId);
+    if (itemId) {
+      dispatch(deleteEventBudgetItem(eventId, itemId));
+    } else {
+      console.error("Attempted to delete item with undefined ID");
     }
   };
 
-  const handleDeleteItem = (id) => {
-    dispatch(deleteEventBudgetItem(eventId, id));
+  const handleEditRedirect = (item) => {
+    const category = item.category.split(" - ")[0];
+    navigate(`/vendors/${category}?eventId=${eventId}`);
   };
 
   const totalExpenses = items.reduce(
@@ -63,10 +72,6 @@ function Budget() {
   const remainingBudget = totalBudget - totalExpenses;
   const budgetProgress =
     totalBudget > 0 ? (totalExpenses / totalBudget) * 100 : 0;
-
-  const handleUpdateTotalBudget = (newBudget) => {
-    dispatch(setEventTotalBudget(eventId, Number(newBudget)));
-  };
 
   if (!event) {
     return (
@@ -167,7 +172,7 @@ function Budget() {
                 </thead>
                 <tbody>
                   {items.map((item) => (
-                    <tr key={item.id}>
+                    <tr key={item.id || `temp_${item.category}_${item.amount}`}>
                       <td>{item.category}</td>
                       <td>₹{Number(item.amount).toFixed(2)}</td>
                       <td>
@@ -175,10 +180,7 @@ function Budget() {
                           variant="outline-primary"
                           size="sm"
                           className="me-2"
-                          onClick={() => {
-                            setEditingItem(item);
-                            setShowEditModal(true);
-                          }}
+                          onClick={() => handleEditRedirect(item)}
                         >
                           Edit
                         </Button>
@@ -198,43 +200,6 @@ function Budget() {
           </Card>
         </Col>
       </Row>
-      <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Edit Budget Item</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group className="mb-3">
-              <Form.Label>Category</Form.Label>
-              <Form.Control
-                type="text"
-                value={editingItem?.category || ""}
-                onChange={(e) =>
-                  setEditingItem({ ...editingItem, category: e.target.value })
-                }
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Amount</Form.Label>
-              <Form.Control
-                type="number"
-                value={editingItem?.amount || ""}
-                onChange={(e) =>
-                  setEditingItem({ ...editingItem, amount: e.target.value })
-                }
-              />
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowEditModal(false)}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={handleUpdateItem}>
-            Save Changes
-          </Button>
-        </Modal.Footer>
-      </Modal>
     </Container>
   );
 }

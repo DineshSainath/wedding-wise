@@ -43,11 +43,24 @@ function VendorCategory() {
     }
   }, [category]);
 
+  const isVendorAdded = (vendor) => {
+    if (!currentEvent || !currentEvent.services) return false;
+    return currentEvent.services.some(
+      (service) => service.id === vendor.id && service.category === category
+    );
+  };
+
   const handleAddService = (vendor) => {
     if (eventId) {
+      if (isVendorAdded(vendor)) {
+        setToastMessage(`${vendor.name} is already added to your event!`);
+        setShowToast(true);
+        return;
+      }
       dispatch(addServiceToEvent(parseInt(eventId), { ...vendor, category }));
       dispatch(
         addEventBudgetItem(parseInt(eventId), {
+          id: `item_${Date.now()}`,
           category: `${category} - ${vendor.name}`,
           amount: vendor.cost,
         })
@@ -68,9 +81,17 @@ function VendorCategory() {
   };
 
   const handleAddServiceToEvent = (eventId) => {
+    const targetEvent = events.find((event) => event.id === eventId);
+    if (targetEvent && targetEvent.services && isVendorAdded(selectedVendor)) {
+      setToastMessage(`${selectedVendor.name} is already added to the event!`);
+      setShowToast(true);
+      setShowEventModal(false);
+      return;
+    }
     dispatch(addServiceToEvent(eventId, selectedVendor));
     dispatch(
       addEventBudgetItem(eventId, {
+        id: `item_${Date.now()}`,
         category: `${selectedVendor.category} - ${selectedVendor.name}`,
         amount: selectedVendor.cost,
       })
@@ -87,9 +108,9 @@ function VendorCategory() {
           Back to Vendors
         </Button>
         <h2 className="title m-0 text-center flex-grow-1">{category}</h2>
-        {eventId ? (
+        {eventId && currentEvent ? (
           <Badge bg="info" className="event-badge flex-shrink-0">
-            For Event: {currentEvent?.name || eventId}
+            For Event: {currentEvent.name}
           </Badge>
         ) : (
           <div className="badge-placeholder"></div>
@@ -108,10 +129,11 @@ function VendorCategory() {
                   </Card.Subtitle>
                   <Card.Text>{vendor.description}</Card.Text>
                   <Button
-                    variant="primary"
+                    variant={isVendorAdded(vendor) ? "secondary" : "primary"}
                     onClick={() => handleAddService(vendor)}
+                    disabled={isVendorAdded(vendor)}
                   >
-                    Add Service
+                    {isVendorAdded(vendor) ? "Already Added" : "Add Service"}
                   </Button>
                 </Card.Body>
               </Card>

@@ -1,5 +1,6 @@
 import { Button } from "react-bootstrap";
 import Carousel from "react-bootstrap/Carousel";
+import { Link } from "react-router-dom";
 
 function LandingCarousel() {
   return (
@@ -15,7 +16,9 @@ function LandingCarousel() {
             <strong>Wedding Wise</strong>
           </h1>
           <p>Creating Heaven for Marriages</p>
-          <Button> Start Planning </Button>
+          <Link to="/events" className="btn btn-primary">
+            Start Planning
+          </Link>
         </Carousel.Caption>
       </Carousel.Item>
       <Carousel.Item>

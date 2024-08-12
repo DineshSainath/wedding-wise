@@ -1,4 +1,3 @@
-// server.js
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -19,6 +18,8 @@ mongoose
 // Routes
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/events", require("./routes/events"));
+app.use("/api/budget", require("./routes/budget"));
+app.use("/api/vendors", require("./routes/vendors"));
 
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to the Wedding Planner API" });

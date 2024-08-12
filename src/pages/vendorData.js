@@ -1,4 +1,4 @@
-export const vendorData = {
+const vendorData = {
   Venues: [
     {
       id: 1,
@@ -156,3 +156,5 @@ export const vendorData = {
     },
   ],
 };
+
+module.exports = { vendorData };

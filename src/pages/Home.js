@@ -10,7 +10,6 @@ import {
   Form,
 } from "react-bootstrap";
 import { addEvent } from "../redux/actions/eventActions";
-import { updateEventBudget } from "../redux/actions/budgetActions";
 import LandingCarousel from "../components/Carousel";
 import "../styles/custom.css";
 
@@ -47,9 +46,12 @@ function Home() {
   };
 
   const handleCreateEvent = () => {
-    const eventId = Date.now();
-    dispatch(addEvent({ ...newEvent, id: eventId }));
-    dispatch(updateEventBudget(eventId, selectedPackage.price));
+    const eventData = {
+      ...newEvent,
+      package: selectedPackage.name,
+      budget: selectedPackage.price,
+    };
+    dispatch(addEvent(eventData));
     setShowModal(false);
     setNewEvent({ name: "", date: "", details: "" });
   };

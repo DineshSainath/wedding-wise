@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import {
   Container,
   Row,
@@ -11,72 +11,98 @@ import {
   Table,
   ProgressBar,
   Alert,
+  Spinner,
 } from "react-bootstrap";
 import {
-  setEventTotalBudget,
-  addEventBudgetItem,
-  deleteEventBudgetItem,
+  fetchBudget,
+  addBudgetItem,
+  updateBudgetItem,
+  deleteBudgetItem,
 } from "../redux/actions/budgetActions";
 
 function Budget() {
   const { eventId } = useParams();
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const event = useSelector((state) =>
     state.events.events.find((e) => e.id === parseInt(eventId))
   );
-  const eventBudget = useSelector(
-    (state) =>
-      state.budget.eventBudgets[eventId] || { totalBudget: 0, items: [] }
-  );
-  const { totalBudget, items = [] } = eventBudget;
-
+  const budget = useSelector((state) => state.budget.eventBudgets?.[eventId]);
   const [newItem, setNewItem] = useState({ category: "", amount: "" });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const loadBudget = async () => {
+      try {
+        setLoading(true);
+        await dispatch(fetchBudget(eventId));
+        setLoading(false);
+      } catch (err) {
+        setError("Failed to load budget. Please try again.");
+        setLoading(false);
+      }
+    };
+
+    if (eventId) {
+      loadBudget();
+    }
+  }, [eventId, dispatch]);
 
   const handleAddItem = (e) => {
     e.preventDefault();
-    if (newItem.category && newItem.amount) {
-      const itemToAdd = {
-        ...newItem,
-        id: `item_${Date.now()}`,
-        amount: Number(newItem.amount),
-      };
-      dispatch(addEventBudgetItem(eventId, itemToAdd));
-      setNewItem({ category: "", amount: "" });
-    }
+    dispatch(addBudgetItem(eventId, newItem));
+    setNewItem({ category: "", amount: "" });
+  };
+
+  const handleUpdateItem = (itemId, updatedItem) => {
+    dispatch(updateBudgetItem(eventId, itemId, updatedItem));
   };
 
   const handleDeleteItem = (itemId) => {
-    if (itemId) {
-      dispatch(deleteEventBudgetItem(eventId, itemId));
-    } else {
-      console.error("Attempted to delete item with undefined ID");
+    if (window.confirm("Are you sure you want to delete this item?")) {
+      dispatch(deleteBudgetItem(eventId, itemId));
     }
   };
 
-  const handleEditItem = (item) => {
-    const category = item.category.split(" - ")[0];
-    navigate(`/vendors/${category}?eventId=${eventId}`);
-  };
+  if (loading) {
+    return (
+      <Container className="text-center mt-5">
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+      </Container>
+    );
+  }
 
-  const totalExpenses = items.reduce(
-    (sum, item) => sum + Number(item.amount),
-    0
-  );
-  const remainingBudget = totalBudget - totalExpenses;
-  const budgetProgress =
-    totalBudget > 0 ? (totalExpenses / totalBudget) * 100 : 0;
-
-  if (!event) {
+  if (error) {
     return (
       <Container>
-        <Alert variant="danger">Event not found</Alert>
+        <Alert variant="danger">{error}</Alert>
         <Link to="/events" className="btn btn-primary">
           Back to Events
         </Link>
       </Container>
     );
   }
+
+  if (!event || !budget) {
+    return (
+      <Container>
+        <Alert variant="warning">Event or budget not found.</Alert>
+        <Link to="/events" className="btn btn-primary">
+          Back to Events
+        </Link>
+      </Container>
+    );
+  }
+
+  const totalBudget = budget.totalBudget || 0;
+  const totalExpenses = budget.items
+    ? budget.items.reduce((sum, item) => sum + Number(item.amount), 0)
+    : 0;
+  const remainingBudget = totalBudget - totalExpenses;
+  const budgetProgress =
+    totalBudget > 0 ? (totalExpenses / totalBudget) * 100 : 0;
 
   return (
     <Container>
@@ -95,7 +121,11 @@ function Budget() {
                   value={totalBudget}
                   onChange={(e) =>
                     dispatch(
-                      setEventTotalBudget(eventId, Number(e.target.value))
+                      updateBudgetItem(
+                        eventId,
+                        "totalBudget",
+                        Number(e.target.value)
+                      )
                     )
                   }
                 />
@@ -125,6 +155,7 @@ function Budget() {
                         onChange={(e) =>
                           setNewItem({ ...newItem, category: e.target.value })
                         }
+                        required
                       />
                     </Form.Group>
                   </Col>
@@ -137,6 +168,7 @@ function Budget() {
                         onChange={(e) =>
                           setNewItem({ ...newItem, amount: e.target.value })
                         }
+                        required
                       />
                     </Form.Group>
                   </Col>
@@ -165,29 +197,22 @@ function Budget() {
                   </tr>
                 </thead>
                 <tbody>
-                  {items.map((item) => (
-                    <tr key={item.id}>
-                      <td>{item.category}</td>
-                      <td>₹{Number(item.amount).toFixed(2)}</td>
-                      <td>
-                        <Button
-                          variant="outline-primary"
-                          size="sm"
-                          onClick={() => handleEditItem(item)}
-                          className="me-2"
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="outline-danger"
-                          size="sm"
-                          onClick={() => handleDeleteItem(item.id)}
-                        >
-                          Delete
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
+                  {budget.items &&
+                    budget.items.map((item) => (
+                      <tr key={item.id}>
+                        <td>{item.category}</td>
+                        <td>₹{Number(item.amount).toFixed(2)}</td>
+                        <td>
+                          <Button
+                            variant="outline-danger"
+                            size="sm"
+                            onClick={() => handleDeleteItem(item.id)}
+                          >
+                            Delete
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
                 </tbody>
               </Table>
             </Card.Body>

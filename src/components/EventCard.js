@@ -15,29 +15,35 @@ function EventCard({ event, onUpdate, onDelete }) {
   const [editedEvent, setEditedEvent] = useState(event);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
 
-  const eventBudget = useSelector(
-    (state) =>
-      state.budget.eventBudgets[event.id] || { totalBudget: 0, items: [] }
+  const eventBudget = useSelector((state) => {
+    console.log("Full Redux State:", state);
+    console.log("Event ID:", event.id);
+    console.log(
+      "Event Budget from Redux:",
+      state.budget.eventBudgets[event.id]
+    );
+    console.log("Event Budget from props:", event.budget);
+    return (
+      state.budget.eventBudgets[event.id] ||
+      event.budget || { totalBudget: 0, items: [] }
+    );
+  });
+
+  console.log("Final Event Budget used:", eventBudget);
+
+  const services = event.services || [];
+
+  const totalBudget = eventBudget.totalBudget || 0;
+  const totalExpenses = services.reduce(
+    (sum, service) => sum + Number(service.cost),
+    0
   );
-
-  // new code
-  const services = eventBudget.items.map((item) => ({
-    id: item.id,
-    name: item.category.split(" - ")[1],
-    category: item.category.split(" - ")[0],
-    cost: item.amount,
-  }));
-
-  const totalExpenses = eventBudget.items
-    ? eventBudget.items.reduce((sum, item) => sum + Number(item.amount), 0)
-    : 0;
-  const remainingBudget = eventBudget.totalBudget - totalExpenses;
+  const remainingBudget = totalBudget - totalExpenses;
   const budgetProgress =
-    eventBudget.totalBudget > 0
-      ? (totalExpenses / eventBudget.totalBudget) * 100
-      : 0;
+    totalBudget > 0 ? (totalExpenses / totalBudget) * 100 : 0;
 
   const handleSave = () => {
+    console.log("Saving edited event:", editedEvent);
     onUpdate(editedEvent);
     setIsEditing(false);
   };
@@ -45,6 +51,11 @@ function EventCard({ event, onUpdate, onDelete }) {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setEditedEvent((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toISOString().split("T")[0]; // This will return 'YYYY-MM-DD'
   };
 
   return (
@@ -71,7 +82,7 @@ function EventCard({ event, onUpdate, onDelete }) {
               <Form.Control
                 type="date"
                 name="date"
-                value={editedEvent.date}
+                value={formatDate(editedEvent.date)}
                 onChange={handleChange}
               />
             </Form.Group>
@@ -82,6 +93,23 @@ function EventCard({ event, onUpdate, onDelete }) {
                 name="details"
                 value={editedEvent.details}
                 onChange={handleChange}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Budget</Form.Label>
+              <Form.Control
+                type="number"
+                name="budget"
+                value={editedEvent.budget?.totalBudget || ""}
+                onChange={(e) =>
+                  setEditedEvent((prev) => ({
+                    ...prev,
+                    budget: {
+                      ...prev.budget,
+                      totalBudget: Number(e.target.value),
+                    },
+                  }))
+                }
               />
             </Form.Group>
             <Button variant="primary" type="submit" className="me-2">
@@ -95,7 +123,7 @@ function EventCard({ event, onUpdate, onDelete }) {
           <>
             <Card.Title>{event.name}</Card.Title>
             <Card.Subtitle className="mb-2 text-muted">
-              Date: {event.date}
+              Date: {formatDate(event.date)}
             </Card.Subtitle>
             <Card.Text>{event.details}</Card.Text>
             <div className="mb-3">
@@ -104,6 +132,8 @@ function EventCard({ event, onUpdate, onDelete }) {
                 now={budgetProgress}
                 label={`${budgetProgress.toFixed(2)}%`}
               />
+              <small>Total Budget: ₹{totalBudget.toFixed(2)}</small>
+              <br />
               <small>Remaining: ₹{remainingBudget.toFixed(2)}</small>
             </div>
             <Button
@@ -129,7 +159,7 @@ function EventCard({ event, onUpdate, onDelete }) {
             </Button>
             <Link
               to={`/budget/${event.id}`}
-              className="manage-budget btn btn-outline-success"
+              className="btn btn-outline-success"
             >
               Manage Budget
             </Link>
@@ -143,14 +173,14 @@ function EventCard({ event, onUpdate, onDelete }) {
         </Modal.Header>
         <Modal.Body>
           <p>
-            <strong>Date:</strong> {event.date}
+            <strong>Date:</strong> {formatDate(event.date)}
           </p>
           <p>
             <strong>Details:</strong> {event.details}
           </p>
           <h5>Vendor Services</h5>
           <ListGroup>
-            {services.map((service, index) => (
+            {services.map((service) => (
               <ListGroup.Item key={service.id}>
                 {service.name} - {service.category} - ₹{service.cost}
               </ListGroup.Item>

@@ -1,31 +1,68 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { Container } from "react-bootstrap";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
+import { useSelector } from "react-redux";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 import Home from "./pages/Home";
 import Events from "./pages/Events";
 import Vendors from "./pages/Vendors";
 import VendorCategory from "./pages/VendorCategory";
 import Budget from "./pages/Budget";
-import "./styles/custom.css";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+
+const PrivateRoute = ({ children }) => {
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  return isAuthenticated ? children : <Navigate to="/login" />;
+};
 
 function App() {
   return (
     <Router>
-      <div className="d-flex flex-column min-vh-100">
-        <Navbar />
-        <Container className="flex-grow-1 py-4">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/events" element={<Events />} />
-            <Route path="/Vendors" element={<Vendors />} />
-            <Route path="/Vendors/:category" element={<VendorCategory />} />
-            <Route path="/budget/:eventId" element={<Budget />} />
-          </Routes>
-        </Container>
-        <Footer />
-      </div>
+      <Navbar />
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/" element={<Home />} />
+        <Route
+          path="/events"
+          element={
+            <PrivateRoute>
+              <Events />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/vendors"
+          element={
+            <PrivateRoute>
+              <Vendors />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/vendors/:category"
+          element={
+            <PrivateRoute>
+              <VendorCategory />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/budget/:eventId"
+          element={
+            <PrivateRoute>
+              <Budget />
+            </PrivateRoute>
+          }
+        />
+      </Routes>
+      <Footer />
     </Router>
   );
 }

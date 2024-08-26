@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useLocation, useNavigate, Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Container,
   Row,
@@ -10,11 +11,8 @@ import {
   Toast,
   Modal,
 } from "react-bootstrap";
-import { useDispatch, useSelector } from "react-redux";
-import { updateEventBudget } from "../redux/actions/budgetActions";
+import { fetchVendorsByCategory } from "../redux/actions/vendorActions";
 import { addServiceToEvent } from "../redux/actions/eventActions";
-import { addEventBudgetItem } from "../redux/actions/budgetActions";
-import { vendorData } from "./vendorData";
 
 function VendorCategory() {
   const { category } = useParams();
@@ -30,27 +28,22 @@ function VendorCategory() {
   const [showEventModal, setShowEventModal] = useState(false);
   const [selectedVendor, setSelectedVendor] = useState(null);
 
+  const vendors = useSelector(
+    (state) => state.vendors.vendorsByCategory[category] || []
+  );
   const events = useSelector((state) => state.events.events);
   const currentEvent = useSelector((state) =>
     state.events.events.find((event) => event.id === parseInt(eventId))
   );
-  const eventBudget = useSelector(
-    (state) =>
-      state.budget.eventBudgets[eventId] || { totalBudget: 0, items: [] }
-  );
-
-  const [vendors, setVendors] = useState([]);
 
   useEffect(() => {
-    if (vendorData[category]) {
-      setVendors(vendorData[category]);
-    }
-  }, [category]);
+    dispatch(fetchVendorsByCategory(category));
+  }, [category, dispatch]);
 
   const isVendorAdded = (vendor) => {
-    if (!eventBudget || !eventBudget.items) return false;
-    return eventBudget.items.some(
-      (item) => item.category === `${category} - ${vendor.name}`
+    if (!currentEvent || !currentEvent.services) return false;
+    return currentEvent.services.some(
+      (service) => service.id === vendor.id && service.category === category
     );
   };
 
@@ -62,13 +55,6 @@ function VendorCategory() {
         return;
       }
       dispatch(addServiceToEvent(parseInt(eventId), { ...vendor, category }));
-      dispatch(
-        addEventBudgetItem(parseInt(eventId), {
-          id: `item_${Date.now()}`,
-          category: `${category} - ${vendor.name}`,
-          amount: vendor.cost,
-        })
-      );
       setToastMessage(`${vendor.name} added to your event!`);
       setShowToast(true);
     } else if (events.length === 0) {
@@ -86,20 +72,13 @@ function VendorCategory() {
 
   const handleAddServiceToEvent = (eventId) => {
     const targetEvent = events.find((event) => event.id === eventId);
-    if (targetEvent && isVendorAdded(selectedVendor)) {
+    if (targetEvent && targetEvent.services && isVendorAdded(selectedVendor)) {
       setToastMessage(`${selectedVendor.name} is already added to the event!`);
       setShowToast(true);
       setShowEventModal(false);
       return;
     }
     dispatch(addServiceToEvent(eventId, selectedVendor));
-    dispatch(
-      addEventBudgetItem(eventId, {
-        id: `item_${Date.now()}`,
-        category: `${selectedVendor.category} - ${selectedVendor.name}`,
-        amount: selectedVendor.cost,
-      })
-    );
     setToastMessage(`${selectedVendor.name} added to your event!`);
     setShowToast(true);
     setShowEventModal(false);

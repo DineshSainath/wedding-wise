@@ -1,18 +1,16 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { Navbar, Nav, Container } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
-import { Navbar, Nav, Container, Button } from "react-bootstrap";
-import { logout } from "../redux/actions/authActions";
+import { logoutUser } from "../redux/actions/authActions"; // Import the logout action
 import "../styles/custom.css";
 
 function AppNavbar() {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const handleLogout = () => {
-    dispatch(logout());
-    navigate("/login");
+    dispatch(logoutUser()); // Dispatch the logout action
   };
 
   return (
@@ -24,17 +22,18 @@ function AppNavbar() {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">
+            <Nav.Link href="/#package">Packages</Nav.Link>
+            <Nav.Link as={Link} to="/events">
+              Events
+            </Nav.Link>
+            <Nav.Link as={Link} to="/Vendors">
+              Vendors
+            </Nav.Link>
             {isAuthenticated ? (
               <>
-                <Nav.Link as={Link} to="/events">
-                  Events
-                </Nav.Link>
-                <Nav.Link as={Link} to="/vendors">
-                  Vendors
-                </Nav.Link>
-                <Button variant="outline-light" onClick={handleLogout}>
+                <Nav.Link as={Link} to="/" onClick={handleLogout}>
                   Logout
-                </Button>
+                </Nav.Link>
               </>
             ) : (
               <>

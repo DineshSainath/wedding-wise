@@ -13,7 +13,7 @@ function Vendors() {
 
   const events = useSelector((state) => state.events.events);
   const currentEvent = useSelector((state) =>
-    state.events.events.find((event) => event.id === parseInt(eventId))
+    state.events.events.find((event) => event._id === parseInt(eventId))
   );
 
   //

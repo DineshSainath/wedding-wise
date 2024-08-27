@@ -1,60 +1,49 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { Container, Form, Button, Alert } from "react-bootstrap";
-import { login } from "../redux/actions/authActions";
+import { Form, Button, Container } from "react-bootstrap";
+import { Formik, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import { loginUser } from "../redux/actions/authActions"; // Add this action in your redux actions
 
 function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    try {
-      const success = await dispatch(login(email, password));
-      if (success) {
-        navigate("/events");
-      } else {
-        setError("Invalid email or password");
-      }
-    } catch (err) {
-      setError("An error occurred. Please try again.");
-    }
+  const validationSchema = Yup.object().shape({
+    email: Yup.string().email("Invalid email format").required("Email is required"),
+    password: Yup.string().required("Password is required"),
+  });
+
+  const handleLogin = (values, { setSubmitting }) => {
+    dispatch(loginUser(values));
+    setSubmitting(false);
   };
 
   return (
-    <Container className="mt-5">
-      <h2>Login</h2>
-      {error && <Alert variant="danger">{error}</Alert>}
-      <Form onSubmit={handleSubmit}>
-        <Form.Group className="mb-3">
-          <Form.Label>Email address</Form.Label>
-          <Form.Control
-            type="email"
-            placeholder="Enter email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>Password</Form.Label>
-          <Form.Control
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </Form.Group>
-        <Button variant="primary" type="submit">
-          Login
-        </Button>
-      </Form>
+    <Container>
+      <h2 className="mb-3">Login</h2>
+      <Formik
+        initialValues={{ email: "", password: "" }}
+        validationSchema={validationSchema}
+        onSubmit={handleLogin}
+      >
+        {({ handleSubmit, isSubmitting }) => (
+          <Form onSubmit={handleSubmit}>
+            <Form.Group className="mb-3">
+              <Form.Label>Email</Form.Label>
+              <Field name="email" type="email" as={Form.Control} />
+              <ErrorMessage name="email" component="div" className="text-danger" />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Password</Form.Label>
+              <Field name="password" type="password" as={Form.Control} />
+              <ErrorMessage name="password" component="div" className="text-danger" />
+            </Form.Group>
+            <Button type="submit" variant="primary" disabled={isSubmitting}>
+              Login
+            </Button>
+          </Form>
+        )}
+      </Formik>
     </Container>
   );
 }

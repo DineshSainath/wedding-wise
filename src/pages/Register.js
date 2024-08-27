@@ -1,71 +1,63 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { Container, Form, Button, Alert } from "react-bootstrap";
-import { register } from "../redux/actions/authActions";
+import { Form, Button, Container } from "react-bootstrap";
+import { Formik, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import { registerUser } from "../redux/actions/authActions"; // Add this action in your redux actions
 
 function Register() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    try {
-      const success = await dispatch(register(name, email, password));
-      if (success) {
-        navigate("/events");
-      } else {
-        setError("Registration failed. Please try again.");
-      }
-    } catch (err) {
-      setError("An error occurred. Please try again.");
-    }
+  const validationSchema = Yup.object().shape({
+    name: Yup.string().required("Name is required"),
+    email: Yup.string().email("Invalid email format").required("Email is required"),
+    password: Yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
+    confirmPassword: Yup.string()
+      .oneOf([Yup.ref("password"), null], "Passwords must match")
+      .required("Confirm Password is required"),
+  });
+
+  const handleRegister = (values, { setSubmitting }) => {
+    dispatch(registerUser(values));
+    setSubmitting(false);
   };
 
   return (
-    <Container className="mt-5">
-      <h2>Register</h2>
-      {error && <Alert variant="danger">{error}</Alert>}
-      <Form onSubmit={handleSubmit}>
-        <Form.Group className="mb-3">
-          <Form.Label>Name</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Enter your name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>Email address</Form.Label>
-          <Form.Control
-            type="email"
-            placeholder="Enter email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>Password</Form.Label>
-          <Form.Control
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </Form.Group>
-        <Button variant="primary" type="submit">
-          Register
-        </Button>
-      </Form>
+    <Container>
+      <h2 className="mb-3">Register</h2>
+      <Formik
+        initialValues={{ name: "", email: "", password: "", confirmPassword: "" }}
+        validationSchema={validationSchema}
+        onSubmit={handleRegister}
+      >
+        {({ handleSubmit, isSubmitting }) => (
+          <Form onSubmit={handleSubmit}>
+            <Form.Group className="mb-3">
+              <Form.Label>Name</Form.Label>
+              <Field name="name" type="text" as={Form.Control} />
+              <ErrorMessage name="name" component="div" className="text-danger" />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Email</Form.Label>
+              <Field name="email" type="email" as={Form.Control} />
+              <ErrorMessage name="email" component="div" className="text-danger" />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Password</Form.Label>
+              <Field name="password" type="password" as={Form.Control} />
+              <ErrorMessage name="password" component="div" className="text-danger" />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Confirm Password</Form.Label>
+              <Field name="confirmPassword" type="password" as={Form.Control} />
+              <ErrorMessage name="confirmPassword" component="div" className="text-danger" />
+            </Form.Group>
+            <Button type="submit" variant="primary" disabled={isSubmitting}>
+              Register
+            </Button>
+          </Form>
+        )}
+      </Formik>
     </Container>
   );
 }

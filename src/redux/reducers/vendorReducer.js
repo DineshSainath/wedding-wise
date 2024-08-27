@@ -1,19 +1,10 @@
-import { FETCH_VENDORS_BY_CATEGORY_SUCCESS } from "../actions/vendorActions";
-
 const initialState = {
-  vendorsByCategory: {},
+  vendors: [],
 };
 
 const vendorReducer = (state = initialState, action) => {
   switch (action.type) {
-    case FETCH_VENDORS_BY_CATEGORY_SUCCESS:
-      return {
-        ...state,
-        vendorsByCategory: {
-          ...state.vendorsByCategory,
-          [action.payload.category]: action.payload.vendors,
-        },
-      };
+    // Add cases as needed
     default:
       return state;
   }

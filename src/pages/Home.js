@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Container,
   Row,
@@ -10,14 +10,17 @@ import {
   Form,
 } from "react-bootstrap";
 import { addEvent } from "../redux/actions/eventActions";
+import { updateEventBudget } from "../redux/actions/budgetActions";
 import LandingCarousel from "../components/Carousel";
 import "../styles/custom.css";
+import axios from "axios";
 
 function Home() {
   const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState(null);
-  const [newEvent, setNewEvent] = useState({ name: "", date: "", details: "" });
+  const [newEvent, setNewEvent] = useState({ name: "", date: "", details: "", budget:0 });
+  const token = useSelector((state) => state.auth.token);
 
   const packages = [
     {
@@ -45,16 +48,42 @@ function Home() {
     setShowModal(true);
   };
 
-  const handleCreateEvent = () => {
-    const eventData = {
-      ...newEvent,
-      package: selectedPackage.name,
-      budget: selectedPackage.price,
-    };
-    dispatch(addEvent(eventData));
-    setShowModal(false);
-    setNewEvent({ name: "", date: "", details: "" });
+  const handleCreateEvent = async () => {
+  
+    console.log('token', token)
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/events",
+        {
+          name: newEvent.name,
+          date: newEvent.date,
+          details: newEvent.details,
+          budget: newEvent.budget
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-auth-token": token,
+          },
+        }
+      );
+  
+      if (response.status === 200 || response.status === 201) {
+        console.log(response.data)
+        const eventId = response.data._id; // Assuming the API returns the event ID
+        dispatch(addEvent({ ...newEvent, id: eventId }));
+        dispatch(updateEventBudget(eventId, selectedPackage.price));
+        setShowModal(false);
+        setNewEvent({ name: "", date: "", details: "" });
+      } else {
+        alert("Failed to create event:",response?.data?.msg);
+      }
+    } catch (error) {
+      console.log(error)
+      alert("Error creating event "+error.response.statusText);
+    }
   };
+  
 
   return (
     <Container>
@@ -105,6 +134,17 @@ function Home() {
                 value={newEvent.date}
                 onChange={(e) =>
                   setNewEvent({ ...newEvent, date: e.target.value })
+                }
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Budget</Form.Label>
+              <Form.Control
+                type="number"
+                value={newEvent.budget}
+                onChange={(e) =>
+                  setNewEvent({ ...newEvent, budget: e.target.value })
                 }
               />
             </Form.Group>

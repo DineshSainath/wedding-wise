@@ -1,37 +1,62 @@
-import api from "../../services/api";
+import axios from "axios";
 
-export const LOGIN_SUCCESS = "LOGIN_SUCCESS";
-export const LOGIN_FAIL = "LOGIN_FAIL";
-export const REGISTER_SUCCESS = "REGISTER_SUCCESS";
-export const REGISTER_FAIL = "REGISTER_FAIL";
-export const LOGOUT = "LOGOUT";
+// Action types
+const LOGIN_SUCCESS = "LOGIN_SUCCESS";
+const LOGIN_FAIL = "LOGIN_FAIL";
 
-export const login = (email, password) => async (dispatch) => {
+export const loginUser = (credentials) => async (dispatch) => {
+    console.log(credentials)
   try {
-    const res = await api.post("/auth/login", { email, password });
+    const response = await axios.post("http://localhost:5000/api/auth/login", credentials);
+    const { token } = response.data;
+    console.log('response',response)
+
+    // // Store the token in localStorage
+    localStorage.setItem("token", token);
+
+    // // Dispatch the login success action
     dispatch({
       type: LOGIN_SUCCESS,
-      payload: res.data,
+      payload: token,
     });
-    return true;
-  } catch (err) {
-    dispatch({ type: LOGIN_FAIL });
-    return false;
-  }
-};
-
-export const register = (name, email, password) => async (dispatch) => {
-  try {
-    const res = await api.post("/auth/register", { name, email, password });
+  window.location.href = "/"; // Redirect to home
+  } catch (error) {
+   alert(error.response?.data?.msg);
     dispatch({
-      type: REGISTER_SUCCESS,
-      payload: res.data,
+      type: LOGIN_FAIL,
+      payload: error.response?.data?.message || "Login failed",
     });
-    return true;
-  } catch (err) {
-    dispatch({ type: REGISTER_FAIL });
-    return false;
   }
 };
 
-export const logout = () => ({ type: LOGOUT });
+  
+  export const registerUser = (userData) => async (dispatch) => {
+    try {
+      const response = await axios.post("http://localhost:5000/api/auth/register", userData);
+      const { token } = response.data;
+      console.log('response',response)
+  
+      // // Store the token in localStorage
+      localStorage.setItem("token", token);
+  
+      // // Dispatch the login success action
+      dispatch({
+        type: LOGIN_SUCCESS,
+        payload: token,
+      });
+
+    window.location.href = "/"; // Redirect to home
+
+    } catch (error) {
+      alert(error.response?.data?.msg);
+      dispatch({
+        type: LOGIN_FAIL,
+        payload: error.response?.data?.message || "Registration failed",
+      });
+    }
+  };
+  
+  export const logoutUser = () => (dispatch) => {
+    localStorage.removeItem("token");
+    dispatch({ type: "LOGOUT" });
+  };

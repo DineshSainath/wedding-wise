@@ -1,168 +1,256 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
-  fetchEvents,
   addEvent,
   updateEvent,
   deleteEvent,
+  setEvents
 } from "../redux/actions/eventActions";
-import {
-  Container,
-  Row,
-  Col,
-  Form,
-  Button,
-  Tabs,
-  Tab,
-  Alert,
-} from "react-bootstrap";
+import { addEventBudgetItem, removeAllEventItems, setEventTotalBudget } from "../redux/actions/budgetActions";
+import { Container, Row, Col, Form, Button, Tabs, Tab } from "react-bootstrap";
+import { Formik, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
 import EventCard from "../components/EventCard";
+import axios from "axios";
 
 function Events() {
-  const [newEvent, setNewEvent] = useState({
-    name: "",
-    date: "",
-    details: "",
-    budget: "",
-  });
-  const [activeTab, setActiveTab] = useState("add");
-  const [alert, setAlert] = useState(null);
-
+  const [activeTab, setActiveTab] = useState("list");
   const events = useSelector((state) => state.events.events);
   const dispatch = useDispatch();
+  const token = useSelector((state) => state.auth.token);
 
-  useEffect(() => {
-    console.log("Fetching events...");
-    dispatch(fetchEvents());
-  }, [dispatch]);
+  const validationSchema = Yup.object().shape({
+    name: Yup.string().required("Event name is required"),
+    date: Yup.date().required("Event date is required"),
+    details: Yup.string(),
+    budget: Yup.number()
+      .positive("Budget must be a positive number")
+      .required("Budget is required"),
+  });
 
-  useEffect(() => {
-    console.log("Events updated:", events);
-  }, [events]);
+  const handleAddEvent = async (values, { resetForm }) => {
 
-  const handleAddEvent = async (e) => {
-    e.preventDefault();
-    console.log("Adding new event:", newEvent);
-
-    const formattedEvent = {
-      ...newEvent,
-      budget: {
-        totalBudget: parseFloat(newEvent.budget) || 0,
-        items: [],
-      },
-    };
-
-    console.log("Formatted event data:", formattedEvent);
-
-    const success = await dispatch(addEvent(formattedEvent));
-
-    if (success) {
-      console.log("Event added successfully");
-      setNewEvent({ name: "", date: "", details: "", budget: "" });
-      setActiveTab("list");
-      setAlert({ type: "success", message: "Event added successfully!" });
-    } else {
-      console.log("Failed to add event");
-      setAlert({
-        type: "danger",
-        message: "Failed to add event. Please try again.",
-      });
+    console.log('token', token)
+    console.log('values', values)
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/events",
+        {
+          name: values.name,
+          date: values.date,
+          details: values.details,
+          budget: values.budget,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-auth-token": token,
+          },
+        }
+      );
+  
+      if (response.status === 200 || response.status === 201) {
+        console.log(response.data)
+        const eventId = response.data.events._id; // Assuming the API returns the event ID
+        dispatch(addEvent({ ...values, id: eventId }));
+        dispatch(setEventTotalBudget(eventId, Number(values.budget)));
+        resetForm();
+        setActiveTab("list");
+      } else {
+        alert("Failed to create event:",response?.data?.msg);
+      }
+    } catch (error) {
+      console.log(error)
+      alert("Error creating event "+error.response.statusText);
     }
   };
 
-  const handleUpdateEvent = (updatedEvent) => {
-    console.log("Updating event:", updatedEvent);
-    dispatch(updateEvent(updatedEvent.id, updatedEvent));
+  const handleUpdateEvent = async (updatedEvent) => {
+
+    try {
+      const response = await axios.put(
+        `http://localhost:5000/api/events/${updatedEvent.eventId}`,
+        {
+          name: updatedEvent.name,
+          date: updatedEvent.date,
+          budget: updatedEvent.budget,
+          details: updatedEvent.details,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-auth-token": token,
+          },
+        }
+      );
+  
+      if (response.status === 200 || response.status === 201) {
+        console.log('updated event', response.data)
+
+        dispatch(updateEvent(response.data));
+    dispatch(setEventTotalBudget(updatedEvent.eventId, Number(updatedEvent.budget)));
+
+
+        // alert(response.data.msg)
+        setActiveTab("list");
+      } else {
+        alert("Failed to create event:",response?.data?.msg);
+      }
+    } catch (error) {
+      console.log(error)
+      alert(error.response.data.msg)
+
+    }
+
   };
 
-  const handleDeleteEvent = (eventId) => {
-    console.log("Deleting event:", eventId);
+  const handleDeleteEvent = async (eventId) => {
+
+
+    try {
+      const response = await axios.delete(
+        `http://localhost:5000/api/events/${eventId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-auth-token": token,
+          },
+        }
+      );
+  
+      if (response.status === 200 || response.status === 201) {
+        console.log(response.data)
     dispatch(deleteEvent(eventId));
+
+        alert(response.data.msg)
+        // setActiveTab("list");
+      } else {
+        alert("Failed to create event:",response?.data?.msg);
+      }
+    } catch (error) {
+      console.log(error)
+      alert(error.response.data.msg)
+
+    }
+
   };
 
-  console.log("Rendering Events component. Current events:", events);
+   useEffect(() => {
+    console.log('useEffect() called')
+    const fetchEvents = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/events", {
+          headers: {
+            "x-auth-token": token,
+          },
+        });
+
+        if (response.status === 200) {
+          let eventData = response.data
+          console.log(eventData);
+          dispatch(setEvents(eventData)); // Assuming you have a setEvents action to set the fetched events in the Redux store
+        } else {
+          alert("Failed to fetch events:", response?.data?.msg);
+        }
+      } catch (error) {
+        console.error("Error fetching events:", error);
+        alert("Error fetching events: " + error.message);
+      }
+    };
+    if(activeTab === "list"){
+    console.log('useEffect() called if')
+
+      fetchEvents();
+
+    }
+  }, [activeTab || events || dispatch]);
 
   return (
     <Container>
       <h2 className="mb-3">Events</h2>
-      {alert && (
-        <Alert variant={alert.type} onClose={() => setAlert(null)} dismissible>
-          {alert.message}
-        </Alert>
-      )}
       <Tabs
         activeKey={activeTab}
         onSelect={(k) => setActiveTab(k)}
         id="events-tabs"
       >
         <Tab eventKey="add" title="Add an Event">
-          <Form onSubmit={handleAddEvent} className="mt-3">
-            <Form.Group className="mb-3">
-              <Form.Label>Event Name</Form.Label>
-              <Form.Control
-                type="text"
-                value={newEvent.name}
-                onChange={(e) =>
-                  setNewEvent({ ...newEvent, name: e.target.value })
-                }
-                required
-              />
-            </Form.Group>
-            <Row>
-              <Col md={6}>
+          <Formik
+            initialValues={{ name: "", date: "", details: "", budget: "" }}
+            validationSchema={validationSchema}
+            onSubmit={handleAddEvent}
+          >
+            {({ handleSubmit, isSubmitting }) => (
+              <Form onSubmit={handleSubmit} className="mt-3">
                 <Form.Group className="mb-3">
-                  <Form.Label>Date</Form.Label>
-                  <Form.Control
-                    type="date"
-                    value={newEvent.date}
-                    onChange={(e) =>
-                      setNewEvent({ ...newEvent, date: e.target.value })
-                    }
-                    required
+                  <Form.Label>Event Name</Form.Label>
+                  <Field name="name" type="text" as={Form.Control} />
+                  <ErrorMessage
+                    name="name"
+                    component="div"
+                    className="text-danger"
                   />
                 </Form.Group>
-              </Col>
-              <Col md={6}>
+                <Row>
+                  <Col md={6}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Date</Form.Label>
+                      <Field name="date" type="date" as={Form.Control} />
+                      <ErrorMessage
+                        name="date"
+                        component="div"
+                        className="text-danger"
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col md={6}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Budget</Form.Label>
+                      <Field name="budget" type="number" as={Form.Control} />
+                      <ErrorMessage
+                        name="budget"
+                        component="div"
+                        className="text-danger"
+                      />
+                    </Form.Group>
+                  </Col>
+                </Row>
                 <Form.Group className="mb-3">
-                  <Form.Label>Budget</Form.Label>
-                  <Form.Control
-                    type="number"
-                    value={newEvent.budget}
-                    onChange={(e) =>
-                      setNewEvent({ ...newEvent, budget: e.target.value })
-                    }
-                    required
+                  <Form.Label>Details</Form.Label>
+                  <Field
+                    name="details"
+                    as="textarea"
+                    rows={3}
+                    className="form-control"
+                  />
+                  <ErrorMessage
+                    name="details"
+                    component="div"
+                    className="text-danger"
                   />
                 </Form.Group>
-              </Col>
-            </Row>
-            <Form.Group className="mb-3">
-              <Form.Label>Details</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={3}
-                value={newEvent.details}
-                onChange={(e) =>
-                  setNewEvent({ ...newEvent, details: e.target.value })
-                }
-              />
-            </Form.Group>
-            <Button type="submit" variant="primary">
-              Add Event
-            </Button>
-          </Form>
+                <Button type="submit" variant="primary" disabled={isSubmitting}>
+                  Add Event
+                </Button>
+              </Form>
+            )}
+          </Formik>
         </Tab>
         <Tab eventKey="list" title="Event List">
           <Row className="mt-3">
-            {events.map((event) => (
-              <Col md={6} lg={4} key={event.id}>
+            {events.map((event) => { 
+
+              return (
+              <Col md={6} lg={4} key={event._id}>
                 <EventCard
                   event={event}
                   onUpdate={handleUpdateEvent}
                   onDelete={handleDeleteEvent}
                 />
               </Col>
-            ))}
+            )
+            }
+          )
+          }
           </Row>
         </Tab>
       </Tabs>

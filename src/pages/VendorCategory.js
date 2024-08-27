@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useLocation, useNavigate, Link } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import {
   Container,
   Row,
@@ -11,8 +10,12 @@ import {
   Toast,
   Modal,
 } from "react-bootstrap";
-import { fetchVendorsByCategory } from "../redux/actions/vendorActions";
+import { useDispatch, useSelector } from "react-redux";
+import { updateEventBudget } from "../redux/actions/budgetActions";
 import { addServiceToEvent } from "../redux/actions/eventActions";
+import { addEventBudgetItem } from "../redux/actions/budgetActions";
+import { vendorData } from "./vendorData";
+import axios from "axios";
 
 function VendorCategory() {
   const { category } = useParams();
@@ -27,36 +30,85 @@ function VendorCategory() {
   const [toastMessage, setToastMessage] = useState("");
   const [showEventModal, setShowEventModal] = useState(false);
   const [selectedVendor, setSelectedVendor] = useState(null);
+  const token = useSelector((state) => state.auth.token);
 
-  const vendors = useSelector(
-    (state) => state.vendors.vendorsByCategory[category] || []
-  );
   const events = useSelector((state) => state.events.events);
   const currentEvent = useSelector((state) =>
-    state.events.events.find((event) => event.id === parseInt(eventId))
+    state.events.events.find((event) => event._id === parseInt(eventId))
+  );
+  const eventBudget = useSelector(
+    (state) =>
+      state.budget.eventBudgets[eventId] || { totalBudget: 0, items: [] }
   );
 
+  const [vendors, setVendors] = useState([]);
+
   useEffect(() => {
-    dispatch(fetchVendorsByCategory(category));
-  }, [category, dispatch]);
+    if (vendorData[category]) {
+      setVendors(vendorData[category]);
+    }
+  }, [category]);
 
   const isVendorAdded = (vendor) => {
-    if (!currentEvent || !currentEvent.services) return false;
-    return currentEvent.services.some(
-      (service) => service.id === vendor.id && service.category === category
+    if (!eventBudget || !eventBudget.items) return false;
+    return eventBudget.items.some(
+      (item) => item.category === `${category} - ${vendor.name}`
     );
   };
 
-  const handleAddService = (vendor) => {
+  const handleAddService = async (vendor) => {
     if (eventId) {
-      if (isVendorAdded(vendor)) {
-        setToastMessage(`${vendor.name} is already added to your event!`);
+      const targetEvent = events.find((event) => event._id === eventId);
+      if (targetEvent && isVendorAdded(vendor)) {
+        setToastMessage(`${vendor.name} is already added to the event!`);
         setShowToast(true);
+        setShowEventModal(false);
         return;
       }
-      dispatch(addServiceToEvent(parseInt(eventId), { ...vendor, category }));
-      setToastMessage(`${vendor.name} added to your event!`);
-      setShowToast(true);
+      let item = {
+        category: vendor.name,
+        name: vendor.name,
+        amount: vendor.cost,
+        id: vendor.id,
+      }
+      console.log(item);
+      try {
+        const response = await axios.post(
+          `http://localhost:5000/api/budget/${eventId}/item`,
+          {
+            category: item.category,
+            amount: item.amount,
+            id: item.id,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "x-auth-token": token,
+            },
+          }
+        );
+    
+        if (response.status === 200 || response.status === 201) {
+          console.log(response.data)
+          dispatch(addServiceToEvent(eventId, item));
+          dispatch(
+            addEventBudgetItem(eventId, response.data)
+          );
+          setToastMessage(`${vendor.name} added to your event!`);
+          setShowToast(true);
+          setShowEventModal(false);
+  
+          // alert(response.data.msg)
+          // setActiveTab("list");
+        } else {
+          alert("Failed to create event:",response?.data?.msg);
+        }
+      } catch (error) {
+        console.log(error)
+        alert(error.response?.data?.msg)
+  
+      }
+    console.log(item);
     } else if (events.length === 0) {
       navigate("/events", {
         state: {
@@ -70,18 +122,60 @@ function VendorCategory() {
     }
   };
 
-  const handleAddServiceToEvent = (eventId) => {
-    const targetEvent = events.find((event) => event.id === eventId);
-    if (targetEvent && targetEvent.services && isVendorAdded(selectedVendor)) {
+  const addServiceItemToEvent = async (eventId, item) => {
+    try {
+      const response = await axios.post(
+        `http://localhost:5000/api/budget/${eventId}/item`,
+        {
+          category: item.category,
+          amount: item.amount,
+          id: item.id,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-auth-token": token,
+          },
+        }
+      );
+  
+      if (response.status === 200 || response.status === 201) {
+        console.log(response.data)
+        dispatch(addServiceToEvent(eventId, selectedVendor));
+        dispatch(
+          addEventBudgetItem(eventId, response.data)
+        );
+        setToastMessage(`${selectedVendor.name} added to your event!`);
+        setShowToast(true);
+        setShowEventModal(false);
+
+        // alert(response.data.msg)
+        // setActiveTab("list");
+      } else {
+        alert("Failed to create event:",response?.data?.msg);
+      }
+    } catch (error) {
+      console.log(error)
+      alert(error.response?.data?.msg)
+
+    }
+  }
+  const handleAddServiceToEvent = async (eventId) => {
+
+    const targetEvent = events.find((event) => event._id === eventId);
+    if (targetEvent && isVendorAdded(selectedVendor)) {
       setToastMessage(`${selectedVendor.name} is already added to the event!`);
       setShowToast(true);
       setShowEventModal(false);
       return;
     }
-    dispatch(addServiceToEvent(eventId, selectedVendor));
-    setToastMessage(`${selectedVendor.name} added to your event!`);
-    setShowToast(true);
-    setShowEventModal(false);
+    let item = {
+      id: `item_${Date.now()}`,
+      category: `${selectedVendor.category} - ${selectedVendor.name}`,
+      amount: selectedVendor.cost,
+    }
+    await addServiceItemToEvent(eventId, item)
+
   };
 
   return (
@@ -102,7 +196,7 @@ function VendorCategory() {
       <Row>
         {vendors.length > 0 ? (
           vendors.map((vendor) => (
-            <Col key={vendor.id} md={4} className="mb-4">
+            <Col key={vendor._id} md={4} className="mb-4">
               <Card>
                 <Card.Body>
                   <Card.Title>{vendor.name}</Card.Title>
@@ -151,10 +245,10 @@ function VendorCategory() {
         <Modal.Body>
           {events.map((event) => (
             <Button
-              key={event.id}
+              key={event._id}
               variant="outline-primary"
               className="m-2"
-              onClick={() => handleAddServiceToEvent(event.id)}
+              onClick={() => handleAddServiceToEvent(event._id)}
             >
               {event.name}
             </Button>

@@ -1,114 +1,111 @@
-import {
-  FETCH_BUDGET_SUCCESS,
-  ADD_BUDGET_ITEM_SUCCESS,
-  UPDATE_BUDGET_ITEM_SUCCESS,
-  DELETE_BUDGET_ITEM_SUCCESS,
-} from "../actions/budgetActions";
-import {
-  FETCH_EVENTS_SUCCESS,
-  ADD_EVENT_SUCCESS,
-  UPDATE_EVENT_SUCCESS,
-} from "../actions/eventActions";
-
 const initialState = {
   eventBudgets: {},
 };
 
 const budgetReducer = (state = initialState, action) => {
   switch (action.type) {
-    case FETCH_EVENTS_SUCCESS:
-      const newEventBudgets = {};
-      action.payload.forEach((event) => {
-        newEventBudgets[event.id] = event.budget || {
-          totalBudget: 0,
-          items: [],
-        };
-      });
-      return {
+    case "SET_EVENT_TOTAL_BUDGET":
+      console.log(action.payload)
+      console.log('prev', state)
+      let newState= {
         ...state,
-        eventBudgets: newEventBudgets,
-      };
+        eventBudgets: {
+          ...state.eventBudgets,
+          [action.payload.eventId]: {
+            ...state.eventBudgets[action.payload.eventId],
+            totalBudget: action.payload.amount,
+            items: state.eventBudgets[action.payload.eventId]?.items || [],
+          },
+        },
+      }
 
-    case ADD_EVENT_SUCCESS:
-    case UPDATE_EVENT_SUCCESS:
+      console.log('new', newState)
+
+      return newState;
+
+    case "ADD_EVENT_BUDGET_ITEM":
+      console.log("Adding item:", action.payload.item);
+      console.log(state)
+      const { eventId, item } = action.payload;
+      let currentItemss = state.eventBudgets[eventId]?.items || [];
+
+      // Check if the item already exists
+      const itemExists = currentItemss.some((existingItem) => existingItem._id === item._id);
+
+      if (itemExists) {
+        // Return the same state if item already exists
+        return { ...state };
+      }
+
       return {
         ...state,
         eventBudgets: {
           ...state.eventBudgets,
-          [action.payload.id]: action.payload.budget || {
+          [action.payload.eventId]: {
+            ...state.eventBudgets[action.payload.eventId],
+            items: [
+              ...(state.eventBudgets[action.payload.eventId]?.items || []),
+              {
+                ...action.payload.item,
+              },
+            ],
+          },
+        },
+      };
+
+    case "REMOVE_ALL_EVENT_ITEMS":
+      console.log("case matched")
+      return {
+        // ...state,
+        eventBudgets: {
+          ...state.eventBudgets,
+          [action.payload.eventId]: {
             totalBudget: 0,
             items: [],
           },
         },
       };
 
-    case FETCH_BUDGET_SUCCESS:
-      return {
-        ...state,
-        eventBudgets: {
-          ...state.eventBudgets,
-          [action.payload.eventId]: {
-            ...state.eventBudgets[action.payload.eventId],
-            ...action.payload.budget,
-          },
-        },
-      };
+    case "DELETE_EVENT_BUDGET_ITEM":
+      console.log("Deleting item. Payload:", action.payload);
+      if (!action.payload.itemId) {
+        console.error("Attempted to delete item with undefined ID");
+        return state;
+      }
+      const currentItems =
+        state.eventBudgets[action.payload.eventId]?.items || [];
 
-    case ADD_BUDGET_ITEM_SUCCESS:
-      return {
-        ...state,
-        eventBudgets: {
-          ...state.eventBudgets,
-          [action.payload.eventId]: {
-            ...state.eventBudgets[action.payload.eventId],
-            totalBudget:
-              (state.eventBudgets[action.payload.eventId]?.totalBudget || 0) +
-              parseFloat(action.payload.item.amount),
-            items: [
-              ...(state.eventBudgets[action.payload.eventId]?.items || []),
-              action.payload.item,
-            ],
-          },
-        },
-      };
+        console.log('currentItems',currentItems)
+        console.log(currentItems.length)
+      const updatedItems = currentItems.filter(
+        (item) => item._id !== action.payload.itemId
+      );
 
-    case UPDATE_BUDGET_ITEM_SUCCESS:
-      const updatedItems = state.eventBudgets[action.payload.eventId].items.map(
-        (item) =>
-          item.id === action.payload.item.id ? action.payload.item : item
-      );
-      const newTotalBudget = updatedItems.reduce(
-        (sum, item) => sum + parseFloat(item.amount),
-        0
-      );
+      console.log('updatedItems',updatedItems)
+      console.log(updatedItems.length)
+
       return {
         ...state,
         eventBudgets: {
           ...state.eventBudgets,
           [action.payload.eventId]: {
             ...state.eventBudgets[action.payload.eventId],
-            totalBudget: newTotalBudget,
             items: updatedItems,
           },
         },
       };
 
-    case DELETE_BUDGET_ITEM_SUCCESS:
-      const remainingItems = state.eventBudgets[
-        action.payload.eventId
-      ].items.filter((item) => item.id !== action.payload.itemId);
-      const updatedTotalBudget = remainingItems.reduce(
-        (sum, item) => sum + parseFloat(item.amount),
-        0
-      );
+    case "UPDATE_EVENT_BUDGET_ITEM":
       return {
         ...state,
         eventBudgets: {
           ...state.eventBudgets,
           [action.payload.eventId]: {
             ...state.eventBudgets[action.payload.eventId],
-            totalBudget: updatedTotalBudget,
-            items: remainingItems,
+            items: state.eventBudgets[action.payload.eventId].items.map(
+              (item) =>
+                item.id === action.payload.item.id ? action.payload.item : item
+            ),
           },
         },
       };

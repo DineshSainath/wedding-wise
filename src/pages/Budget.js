@@ -97,7 +97,8 @@ function Budget() {
 
 
 
-        alert(response.data.msg)
+        // alert(response.data.msg)
+        alert('Item added successfully')
         // setActiveTab("list");
       } else {
         alert("Failed to create event:",response?.data?.msg);

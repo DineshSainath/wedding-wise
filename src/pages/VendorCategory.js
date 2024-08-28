@@ -87,7 +87,8 @@ function VendorCategory() {
             },
           }
         );
-    
+  
+        console.log('status', response.status)
         if (response.status === 200 || response.status === 201) {
           console.log(response.data)
           dispatch(addServiceToEvent(eventId, item));
@@ -100,8 +101,11 @@ function VendorCategory() {
   
           // alert(response.data.msg)
           // setActiveTab("list");
-        } else {
+        } else if (response.status === 204) {
+          alert("Service is already added.");
+        }else {
           alert("Failed to create event:",response?.data?.msg);
+
         }
       } catch (error) {
         console.log(error)
@@ -151,6 +155,8 @@ function VendorCategory() {
 
         // alert(response.data.msg)
         // setActiveTab("list");
+      }else if(response.status === 204){
+        alert('Service is already added.')
       } else {
         alert("Failed to create event:",response?.data?.msg);
       }

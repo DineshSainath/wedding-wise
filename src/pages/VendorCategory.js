@@ -75,7 +75,7 @@ function VendorCategory() {
       console.log(item);
       try {
         const response = await axios.post(
-          `http://localhost:5000/api/budget/${eventId}/item`,
+          `https://wedding-wise-kphj.onrender.com/api/budget/${eventId}/item`,
           {
             category: item.category,
             amount: item.amount,
@@ -126,7 +126,7 @@ function VendorCategory() {
   const addServiceItemToEvent = async (eventId, item) => {
     try {
       const response = await axios.post(
-        `http://localhost:5000/api/budget/${eventId}/item`,
+        `https://wedding-wise-kphj.onrender.com/api/budget/${eventId}/item`,
         {
           category: item.category,
           amount: item.amount,

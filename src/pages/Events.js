@@ -38,7 +38,7 @@ function Events() {
     console.log("values", values);
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/events",
+        "https://wedding-wise-kphj.onrender.com/api/events",
         {
           name: values.name,
           date: values.date,
@@ -72,7 +72,7 @@ function Events() {
   const handleUpdateEvent = async (updatedEvent) => {
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/events/${updatedEvent.eventId}`,
+        `https://wedding-wise-kphj.onrender.com/api/events/${updatedEvent.eventId}`,
         {
           name: updatedEvent.name,
           date: updatedEvent.date,
@@ -109,7 +109,7 @@ function Events() {
   const handleDeleteEvent = async (eventId) => {
     try {
       const response = await axios.delete(
-        `http://localhost:5000/api/events/${eventId}`,
+        `https://wedding-wise-kphj.onrender.com/api/events/${eventId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -137,11 +137,14 @@ function Events() {
     console.log("useEffect() called");
     const fetchEvents = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/events", {
-          headers: {
-            "x-auth-token": token,
-          },
-        });
+        const response = await axios.get(
+          "https://wedding-wise-kphj.onrender.com/api/events",
+          {
+            headers: {
+              "x-auth-token": token,
+            },
+          }
+        );
 
         if (response.status === 200) {
           let eventData = response.data;

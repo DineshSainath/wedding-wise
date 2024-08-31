@@ -19,7 +19,12 @@ function Home() {
   const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState(null);
-  const [newEvent, setNewEvent] = useState({ name: "", date: "", details: "", budget:0 });
+  const [newEvent, setNewEvent] = useState({
+    name: "",
+    date: "",
+    details: "",
+    budget: 0,
+  });
   const token = useSelector((state) => state.auth.token);
 
   const packages = [
@@ -49,16 +54,15 @@ function Home() {
   };
 
   const handleCreateEvent = async () => {
-  
-    console.log('token', token)
+    console.log("token", token);
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/events",
+        "https://wedding-wise-kphj.onrender.com/api/events",
         {
           name: newEvent.name,
           date: newEvent.date,
           details: newEvent.details,
-          budget: newEvent.budget
+          budget: newEvent.budget,
         },
         {
           headers: {
@@ -67,23 +71,22 @@ function Home() {
           },
         }
       );
-  
+
       if (response.status === 200 || response.status === 201) {
-        console.log(response.data)
+        console.log(response.data);
         const eventId = response.data._id; // Assuming the API returns the event ID
         dispatch(addEvent({ ...newEvent, id: eventId }));
         dispatch(updateEventBudget(eventId, selectedPackage.price));
         setShowModal(false);
         setNewEvent({ name: "", date: "", details: "" });
       } else {
-        alert("Failed to create event:",response?.data?.msg);
+        alert("Failed to create event:", response?.data?.msg);
       }
     } catch (error) {
-      console.log(error)
-      alert("Error creating event "+error.response.statusText);
+      console.log(error);
+      alert("Error creating event " + error.response.statusText);
     }
   };
-  
 
   return (
     <Container>

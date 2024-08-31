@@ -76,7 +76,7 @@ function Budget() {
     e.preventDefault();
     try {
       const response = await axios.post(
-        `http://localhost:5000/api/budget/${eventId}/item`,
+        `https://wedding-wise-kphj.onrender.com/api/budget/${eventId}/item`,
         {
           category: newItem.category,
           amount: newItem.amount,
@@ -123,7 +123,7 @@ function Budget() {
     if (itemId) {
       try {
         const response = await axios.delete(
-          `http://localhost:5000/api/budget/${eventId}/item/${itemId}`,
+          `https://wedding-wise-kphj.onrender.com/api/budget/${eventId}/item/${itemId}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -179,7 +179,7 @@ function Budget() {
   const updateEventBudget = async () => {
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/budget/${eventId}`,
+        `https://wedding-wise-kphj.onrender.com/api/budget/${eventId}`,
         {
           newBudget,
         },

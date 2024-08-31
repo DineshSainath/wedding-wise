@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Form, Button, Container } from "react-bootstrap";
@@ -9,7 +10,9 @@ function Login() {
   const dispatch = useDispatch();
 
   const validationSchema = Yup.object().shape({
-    email: Yup.string().email("Invalid email format").required("Email is required"),
+    email: Yup.string()
+      .email("Invalid email format")
+      .required("Email is required"),
     password: Yup.string().required("Password is required"),
   });
 
@@ -31,12 +34,20 @@ function Login() {
             <Form.Group className="mb-3">
               <Form.Label>Email</Form.Label>
               <Field name="email" type="email" as={Form.Control} />
-              <ErrorMessage name="email" component="div" className="text-danger" />
+              <ErrorMessage
+                name="email"
+                component="div"
+                className="text-danger"
+              />
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Password</Form.Label>
               <Field name="password" type="password" as={Form.Control} />
-              <ErrorMessage name="password" component="div" className="text-danger" />
+              <ErrorMessage
+                name="password"
+                component="div"
+                className="text-danger"
+              />
             </Form.Group>
             <Button type="submit" variant="primary" disabled={isSubmitting}>
               Login

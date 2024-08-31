@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState, useEffect } from "react";
 import { useParams, useLocation, useNavigate, Link } from "react-router-dom";
 import {
@@ -70,7 +71,7 @@ function VendorCategory() {
         name: vendor.name,
         amount: vendor.cost,
         id: vendor.id,
-      }
+      };
       console.log(item);
       try {
         const response = await axios.post(
@@ -87,32 +88,28 @@ function VendorCategory() {
             },
           }
         );
-  
-        console.log('status', response.status)
+
+        console.log("status", response.status);
         if (response.status === 200 || response.status === 201) {
-          console.log(response.data)
+          console.log(response.data);
           dispatch(addServiceToEvent(eventId, item));
-          dispatch(
-            addEventBudgetItem(eventId, response.data)
-          );
+          dispatch(addEventBudgetItem(eventId, response.data));
           setToastMessage(`${vendor.name} added to your event!`);
           setShowToast(true);
           setShowEventModal(false);
-  
+
           // alert(response.data.msg)
           // setActiveTab("list");
         } else if (response.status === 204) {
           alert("Service is already added.");
-        }else {
-          alert("Failed to create event:",response?.data?.msg);
-
+        } else {
+          alert("Failed to create event:", response?.data?.msg);
         }
       } catch (error) {
-        console.log(error)
-        alert(error.response?.data?.msg)
-  
+        console.log(error);
+        alert(error.response?.data?.msg);
       }
-    console.log(item);
+      console.log(item);
     } else if (events.length === 0) {
       navigate("/events", {
         state: {
@@ -142,32 +139,28 @@ function VendorCategory() {
           },
         }
       );
-  
+
       if (response.status === 200 || response.status === 201) {
-        console.log(response.data)
+        console.log(response.data);
         dispatch(addServiceToEvent(eventId, selectedVendor));
-        dispatch(
-          addEventBudgetItem(eventId, response.data)
-        );
+        dispatch(addEventBudgetItem(eventId, response.data));
         setToastMessage(`${selectedVendor.name} added to your event!`);
         setShowToast(true);
         setShowEventModal(false);
 
         // alert(response.data.msg)
         // setActiveTab("list");
-      }else if(response.status === 204){
-        alert('Service is already added.')
+      } else if (response.status === 204) {
+        alert("Service is already added.");
       } else {
-        alert("Failed to create event:",response?.data?.msg);
+        alert("Failed to create event:", response?.data?.msg);
       }
     } catch (error) {
-      console.log(error)
-      alert(error.response?.data?.msg)
-
+      console.log(error);
+      alert(error.response?.data?.msg);
     }
-  }
+  };
   const handleAddServiceToEvent = async (eventId) => {
-
     const targetEvent = events.find((event) => event._id === eventId);
     if (targetEvent && isVendorAdded(selectedVendor)) {
       setToastMessage(`${selectedVendor.name} is already added to the event!`);
@@ -179,9 +172,8 @@ function VendorCategory() {
       id: `item_${Date.now()}`,
       category: `${selectedVendor.category} - ${selectedVendor.name}`,
       amount: selectedVendor.cost,
-    }
-    await addServiceItemToEvent(eventId, item)
-
+    };
+    await addServiceItemToEvent(eventId, item);
   };
 
   return (

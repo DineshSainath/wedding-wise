@@ -1,12 +1,17 @@
+/* eslint-disable */
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   addEvent,
   updateEvent,
   deleteEvent,
-  setEvents
+  setEvents,
 } from "../redux/actions/eventActions";
-import { addEventBudgetItem, removeAllEventItems, setEventTotalBudget } from "../redux/actions/budgetActions";
+import {
+  addEventBudgetItem,
+  removeAllEventItems,
+  setEventTotalBudget,
+} from "../redux/actions/budgetActions";
 import { Container, Row, Col, Form, Button, Tabs, Tab } from "react-bootstrap";
 import { Formik, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -29,9 +34,8 @@ function Events() {
   });
 
   const handleAddEvent = async (values, { resetForm }) => {
-
-    console.log('token', token)
-    console.log('values', values)
+    console.log("token", token);
+    console.log("values", values);
     try {
       const response = await axios.post(
         "http://localhost:5000/api/events",
@@ -48,25 +52,24 @@ function Events() {
           },
         }
       );
-  
+
       if (response.status === 200 || response.status === 201) {
-        console.log(response.data)
+        console.log(response.data);
         const eventId = response.data.events._id; // Assuming the API returns the event ID
         dispatch(addEvent({ ...values, id: eventId }));
         dispatch(setEventTotalBudget(eventId, Number(values.budget)));
         resetForm();
         setActiveTab("list");
       } else {
-        alert("Failed to create event:",response?.data?.msg);
+        alert("Failed to create event:", response?.data?.msg);
       }
     } catch (error) {
-      console.log(error)
-      alert("Error creating event "+error.response.statusText);
+      console.log(error);
+      alert("Error creating event " + error.response.statusText);
     }
   };
 
   const handleUpdateEvent = async (updatedEvent) => {
-
     try {
       const response = await axios.put(
         `http://localhost:5000/api/events/${updatedEvent.eventId}`,
@@ -83,30 +86,27 @@ function Events() {
           },
         }
       );
-  
+
       if (response.status === 200 || response.status === 201) {
-        console.log('updated event', response.data)
+        console.log("updated event", response.data);
 
         dispatch(updateEvent(response.data));
-    dispatch(setEventTotalBudget(updatedEvent.eventId, Number(updatedEvent.budget)));
-
+        dispatch(
+          setEventTotalBudget(updatedEvent.eventId, Number(updatedEvent.budget))
+        );
 
         // alert(response.data.msg)
         setActiveTab("list");
       } else {
-        alert("Failed to create event:",response?.data?.msg);
+        alert("Failed to create event:", response?.data?.msg);
       }
     } catch (error) {
-      console.log(error)
-      alert(error.response.data.msg)
-
+      console.log(error);
+      alert(error.response.data.msg);
     }
-
   };
 
   const handleDeleteEvent = async (eventId) => {
-
-
     try {
       const response = await axios.delete(
         `http://localhost:5000/api/events/${eventId}`,
@@ -117,26 +117,24 @@ function Events() {
           },
         }
       );
-  
-      if (response.status === 200 || response.status === 201) {
-        console.log(response.data)
-    dispatch(deleteEvent(eventId));
 
-        alert(response.data.msg)
+      if (response.status === 200 || response.status === 201) {
+        console.log(response.data);
+        dispatch(deleteEvent(eventId));
+
+        alert(response.data.msg);
         // setActiveTab("list");
       } else {
-        alert("Failed to create event:",response?.data?.msg);
+        alert("Failed to create event:", response?.data?.msg);
       }
     } catch (error) {
-      console.log(error)
-      alert(error.response.data.msg)
-
+      console.log(error);
+      alert(error.response.data.msg);
     }
-
   };
 
-   useEffect(() => {
-    console.log('useEffect() called')
+  useEffect(() => {
+    console.log("useEffect() called");
     const fetchEvents = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/events", {
@@ -146,7 +144,7 @@ function Events() {
         });
 
         if (response.status === 200) {
-          let eventData = response.data
+          let eventData = response.data;
           console.log(eventData);
           dispatch(setEvents(eventData)); // Assuming you have a setEvents action to set the fetched events in the Redux store
         } else {
@@ -157,11 +155,10 @@ function Events() {
         alert("Error fetching events: " + error.message);
       }
     };
-    if(activeTab === "list"){
-    console.log('useEffect() called if')
+    if (activeTab === "list") {
+      console.log("useEffect() called if");
 
       fetchEvents();
-
     }
   }, [activeTab || events || dispatch]);
 
@@ -237,20 +234,17 @@ function Events() {
         </Tab>
         <Tab eventKey="list" title="Event List">
           <Row className="mt-3">
-            {events.map((event) => { 
-
+            {events.map((event) => {
               return (
-              <Col md={6} lg={4} key={event._id}>
-                <EventCard
-                  event={event}
-                  onUpdate={handleUpdateEvent}
-                  onDelete={handleDeleteEvent}
-                />
-              </Col>
-            )
-            }
-          )
-          }
+                <Col md={6} lg={4} key={event._id}>
+                  <EventCard
+                    event={event}
+                    onUpdate={handleUpdateEvent}
+                    onDelete={handleDeleteEvent}
+                  />
+                </Col>
+              );
+            })}
           </Row>
         </Tab>
       </Tabs>

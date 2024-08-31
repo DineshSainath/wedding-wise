@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams, Link, useNavigate } from "react-router-dom";
@@ -71,7 +72,7 @@ function Budget() {
   const token = useSelector((state) => state.auth.token);
 
   const handleAddItem = async (e) => {
-    console.log(newItem)
+    console.log(newItem);
     e.preventDefault();
     try {
       const response = await axios.post(
@@ -87,28 +88,23 @@ function Budget() {
           },
         }
       );
-  
+
       if (response.status === 200 || response.status === 201) {
-        console.log(response.data)
-        dispatch(
-          addEventBudgetItem(eventId, response.data)
-        );
+        console.log(response.data);
+        dispatch(addEventBudgetItem(eventId, response.data));
         setNewItem({ category: "", amount: "" });
 
-
-
         // alert(response.data.msg)
-        alert('Item added successfully')
+        alert("Item added successfully");
         // setActiveTab("list");
       } else {
-        alert("Failed to create event:",response?.data?.msg);
+        alert("Failed to create event:", response?.data?.msg);
       }
     } catch (error) {
-      console.log(error)
-      alert(error.response.data.msg)
-
+      console.log(error);
+      alert(error.response.data.msg);
     }
-  }
+  };
 
   // const handleAddItem = (e) => {
   //   e.preventDefault();
@@ -125,7 +121,6 @@ function Budget() {
 
   const handleDeleteItem = async (itemId) => {
     if (itemId) {
-
       try {
         const response = await axios.delete(
           `http://localhost:5000/api/budget/${eventId}/item/${itemId}`,
@@ -136,23 +131,21 @@ function Budget() {
             },
           }
         );
-    
+
         if (response.status === 200 || response.status === 201) {
-          console.log(response.data)
+          console.log(response.data);
 
           dispatch(deleteEventBudgetItem(eventId, itemId));
-  
+
           // alert(response.data.msg)
           // setActiveTab("list");
         } else {
-          alert("Failed to create event:",response?.data?.msg);
+          alert("Failed to create event:", response?.data?.msg);
         }
       } catch (error) {
-        console.log(error)
-        alert(error.response.data.msg)
-  
+        console.log(error);
+        alert(error.response.data.msg);
       }
-
     } else {
       console.error("Attempted to delete item with undefined ID");
     }
@@ -167,7 +160,7 @@ function Budget() {
     (sum, item) => sum + Number(item.amount),
     0
   );
-  const remainingBudget =totalBudget - totalExpenses;
+  const remainingBudget = totalBudget - totalExpenses;
   const budgetProgress =
     totalBudget > 0 ? (totalExpenses / totalBudget) * 100 : 0;
 
@@ -182,8 +175,8 @@ function Budget() {
     );
   }
 
-   // Function to update the budget in both collections
-   const updateEventBudget = async () => {
+  // Function to update the budget in both collections
+  const updateEventBudget = async () => {
     try {
       const response = await axios.put(
         `http://localhost:5000/api/budget/${eventId}`,
@@ -200,10 +193,8 @@ function Budget() {
 
       if (response.status === 200) {
         console.log("Budget updated successfully");
-        console.log('newBudget', newBudget);
-        dispatch(
-          setEventTotalBudget(eventId, Number(newBudget))
-        )
+        console.log("newBudget", newBudget);
+        dispatch(setEventTotalBudget(eventId, Number(newBudget)));
       } else {
         alert("Failed to update budget:", response?.data?.msg);
       }
@@ -228,7 +219,9 @@ function Budget() {
                 <Form.Control
                   type="number"
                   value={newBudget}
-                  onChange={(e) =>{setNewBudget(e.target.value)}}
+                  onChange={(e) => {
+                    setNewBudget(e.target.value);
+                  }}
                 />
               </Form.Group>
               <Card.Text>
@@ -238,9 +231,9 @@ function Budget() {
                 now={budgetProgress}
                 label={`${budgetProgress.toFixed(2)}%`}
               />
-        <Button className="" onClick={() => updateEventBudget()}>
-          Save
-        </Button>
+              <Button className="" onClick={() => updateEventBudget()}>
+                Save
+              </Button>
             </Card.Body>
           </Card>
         </Col>

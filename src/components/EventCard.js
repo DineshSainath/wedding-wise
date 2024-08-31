@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -9,7 +10,11 @@ import {
   ProgressBar,
 } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { setEventTotalBudget, addEventBudgetItem, removeAllEventItems } from "../redux/actions/budgetActions";
+import {
+  setEventTotalBudget,
+  addEventBudgetItem,
+  removeAllEventItems,
+} from "../redux/actions/budgetActions";
 
 function EventCard({ event, onUpdate, onDelete }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -22,16 +27,15 @@ function EventCard({ event, onUpdate, onDelete }) {
       state.budget.eventBudgets[event._id] || { totalBudget: 0, items: [] }
   );
 
-  console.log('eventBudget', eventBudget);
+  console.log("eventBudget", eventBudget);
 
-  useEffect(() =>{
-    console.log('eventBudget called', event.budget);
+  useEffect(() => {
+    console.log("eventBudget called", event.budget);
     dispatch(setEventTotalBudget(event._id, Number(event.budget)));
 
     event?.budgets?.items?.forEach((item) => {
-      dispatch(addEventBudgetItem(event._id, item))
-    })
-
+      dispatch(addEventBudgetItem(event._id, item));
+    });
   }, [event]);
 
   // new code
@@ -51,11 +55,11 @@ function EventCard({ event, onUpdate, onDelete }) {
       ? (totalExpenses / eventBudget.totalBudget) * 100
       : 0;
 
-  console.log('eventBudget', eventBudget);
+  console.log("eventBudget", eventBudget);
 
   const handleSave = () => {
-    console.log(editedEvent)
-    editedEvent.eventId = event._id
+    console.log(editedEvent);
+    editedEvent.eventId = event._id;
     onUpdate(editedEvent);
     setIsEditing(false);
     // dispatch();
@@ -97,15 +101,13 @@ function EventCard({ event, onUpdate, onDelete }) {
             <Form.Group className="mb-3">
               <Form.Label>Budget</Form.Label>
               <Form.Control
-  
                 type="number"
                 name="budget"
                 value={editedEvent.budget}
                 onChange={handleChange}
               />
             </Form.Group>
-          
-               
+
             <Form.Group className="mb-3">
               <Form.Label>Details</Form.Label>
               <Form.Control

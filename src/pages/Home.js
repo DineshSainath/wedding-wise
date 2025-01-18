@@ -121,7 +121,7 @@ function Home() {
         <Modal.Body>
           <Form>
             <Form.Group className="mb-3">
-              <Form.Label>Event Name</Form.Label>
+              <Form.Label>Event</Form.Label>
               <Form.Control
                 type="text"
                 value={newEvent.name}
